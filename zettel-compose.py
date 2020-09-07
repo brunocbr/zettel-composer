@@ -10,7 +10,8 @@ options = {
 	"no-paragraph-headings": False,
 	"heading-identifier": "paragraph-",
 	"watch": True,
-	"sleep-time": 2
+	"sleep-time": 2,
+	"outfile": "zettel-compose.md"
 }
 
 rx_dict = {
@@ -27,15 +28,11 @@ rx_dict = {
 }
 
 
-z_count = { "index": 0, "body": 0, "footnote": 0 }
-
-z_stack = [ ]
-
-z_map = {} # maps zettel id's to paragraph or footnote sequence
-
-
-z_info = {} # contain path, status (se já foi processada)
-
+def _initialize_stack():
+	global z_count, z_stack, z_map
+	z_count = { "index": 0, "body": 0, "footnote": 0 }
+	z_stack = []
+	z_map = {} # maps zettel id's to paragraph or footnote sequence
 
 def _z_get_filepath(zettel_id):
 	"""
@@ -214,12 +211,12 @@ def get_first_modified():
 	return result
 
 def parse_index(pathname):
-	global z_stack
-	global z_map
-	# _z_add_to_stack(zettel_id, "index")
+	global z_stack, z_map, options
+
+	_initialize_stack()
 	_z_set_index(pathname)
 	c = 0
-	with open("compose-output.md", "w") as f_out:
+	with open(options["outfile"], "w") as f_out:
 		while len(z_stack) > c:
 			print ("zettel id " + z_stack[c])
 			d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
@@ -231,9 +228,6 @@ def watch_folder():
 	global z_stack, options
 
 	while True:
-		# cur_mtime = os.path.getmtime(zettel_dir)
-		# if cur_mtime != last_mtime:
-
 		modified = get_first_modified()
 		if modified is not None:
 			print "note " + str(modified) + " id " + z_stack[modified] + " was modified"
