@@ -6,23 +6,23 @@
 
 import re
 from glob import glob
-import os, time, sys
+import os, time, sys, getopt
 
 options = {
 	"no-paragraph-headings": False,
 	"heading-identifier": "paragraph-",
-	"watch": True,
+	"watch": False,
 	"sleep-time": 2,
-	"outfile": "zettel-compose.md"
+	"output": "zettel-compose.md"
 }
 
 rx_dict = {
 #	'link': re.compile(r'[^△▽\+\-\%]\[\[(?P<id>\d{3,})\]\]'),
-	'link': re.compile(r'\[\[(?P<id>\d{3,})\]\](^:|$)'),
 	'no_ref': re.compile(r'\[\[(?P<id>\d{3,})\]\]:'),
 #	'link_b': re.compile(r'^\[\[(?P<id>\d{3,})\]\]'),
 	'footnote': re.compile(r' *\%\[\[(?P<id>\d{3,})\]\]'),
 	'add_ref': re.compile(r'\+\[\[(?P<id>\d{3,})\]\]'),
+	'link': re.compile(r'\[\[(?P<id>\d{3,})\]\]'),
 	'yaml_end_div': re.compile(r'^\.\.\.$'),
 	'yaml_div': re.compile(r'^\-\-\-$'),
 	'md_heading': re.compile(r'^#{1,3}'),
@@ -218,7 +218,7 @@ def parse_index(pathname):
 	_initialize_stack()
 	_z_set_index(pathname)
 	c = 0
-	with open(options["outfile"], "w") as f_out:
+	with open(options["output"], "w") as f_out:
 		while len(z_stack) > c:
 			print ("zettel id " + z_stack[c])
 			d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
@@ -236,8 +236,24 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
+useroptions, infile = getopt.getopt(sys.argv[1:], 'O:H:s:Wn', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output='])
 
-index_filename = sys.argv[1]
+for opt, arg in useroptions:
+	if opt in ('-O', '--output='):
+		options["output"] = arg
+	elif opt in ('-H', 'heading-identifier='):
+		options["heading-identifier"] = arg
+	elif opt in ('-W', '--watch'):
+		options["watch"] = True
+	elif opt in ('-s', '--sleep-time='):
+		options["sleep-time"] = arg
+	elif opt in ('-n', '--no-paragraph-headings'):
+		options["no-paragraph-headings"] = True
+
+
+index_filename = infile[0]
+print "Processing file " + infile[0]
+
 zettel_dir = os.path.dirname(index_filename)
 
 parse_index(index_filename)
@@ -245,6 +261,4 @@ parse_index(index_filename)
 if options["watch"]:
 	print "Will now watch for changes"
 	watch_folder()
-
-
 
