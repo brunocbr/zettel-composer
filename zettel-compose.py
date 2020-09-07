@@ -17,9 +17,7 @@ options = {
 }
 
 rx_dict = {
-#	'link': re.compile(r'[^△▽\+\-\%]\[\[(?P<id>\d{3,})\]\]'),
 	'no_ref': re.compile(r'\[\[(?P<id>\d{3,})\]\]:'),
-#	'link_b': re.compile(r'^\[\[(?P<id>\d{3,})\]\]'),
 	'footnote': re.compile(r' *\%\[\[(?P<id>\d{3,})\]\]'),
 	'add_ref': re.compile(r'\+\[\[(?P<id>\d{3,})\]\]'),
 	'link': re.compile(r'\[\[(?P<id>\d{3,})\]\]'),
