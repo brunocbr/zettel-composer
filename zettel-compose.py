@@ -79,6 +79,7 @@ def _out_link(ref, id):
 	"""
 	Formatted output for link to a reference
 	"""
+	global options
 	if options["no-paragraph-headings"]:
 		return " {>> [[" + str(id) + "]] <<}"
 	else:
@@ -92,6 +93,7 @@ def _out_paragraph_heading(ref, zettel_id):
 	"""
 	Formatted output for a paragraph heading
 	"""
+	global options
 	if options["no-paragraph-headings"]:
 		return "{>> = " + str(zettel_id) + " = <<}"
 	else:
