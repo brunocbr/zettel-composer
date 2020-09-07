@@ -191,7 +191,7 @@ def parse_zettel(z_item, zettel_id):
         if key == 'link':
             link = match.group('id')
             _z_add_to_stack(link, "body")
-            line = rx_dict["link"].sub(_out_link(z_map[link]["ref"] ,link), line)
+            line = rx_dict["link"].sub(_out_link(z_map[link]["ref"], link), line)
 
        	if got_content:
 	       	data.append(line)
@@ -252,7 +252,6 @@ for opt, arg in useroptions:
 	elif opt in ('-S', '--suppress-index'):
 		options["suppress-index"] = True
 
-
 index_filename = infile[0]
 print "Processing file " + infile[0]
 
@@ -263,4 +262,3 @@ parse_index(index_filename)
 if options["watch"]:
 	print "Will now watch for changes"
 	watch_folder()
-
