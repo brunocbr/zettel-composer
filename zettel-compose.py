@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# zettel-compose.py
+# 	by Bruno L. Conte <bruno@brunoc.com.br>, 2020
+
 import re
 from glob import glob
 import os, time, sys
-
 
 options = {
 	"no-paragraph-headings": False,
