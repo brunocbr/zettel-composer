@@ -13,7 +13,8 @@ options = {
 	"heading-identifier": "paragraph-",
 	"watch": False,
 	"sleep-time": 2,
-	"output": "zettel-compose.md"
+	"output": "zettel-compose.md",
+	"suppress-index": False
 }
 
 rx_dict = {
@@ -220,8 +221,9 @@ def parse_index(pathname):
 		while len(z_stack) > c:
 			print ("zettel id " + z_stack[c])
 			d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
-			for l in d:
-				f_out.write("%s\n" % l)
+			if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index"):
+				for l in d:
+					f_out.write("%s\n" % l)
 			c += 1
 
 def watch_folder():
@@ -234,7 +236,7 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'O:H:s:Wn', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output='])
+useroptions, infile = getopt.getopt(sys.argv[1:], 'O:H:s:WnS', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'suppress-index'])
 
 for opt, arg in useroptions:
 	if opt in ('-O', '--output='):
@@ -247,6 +249,8 @@ for opt, arg in useroptions:
 		options["sleep-time"] = arg
 	elif opt in ('-n', '--no-paragraph-headings'):
 		options["no-paragraph-headings"] = True
+	elif opt in ('-S', '--suppress-index'):
+		options["suppress-index"] = True
 
 
 index_filename = infile[0]
