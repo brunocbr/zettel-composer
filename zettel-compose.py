@@ -18,12 +18,14 @@ options = {
 }
 
 rx_dict = {
-	'no_ref': re.compile(r'\[\[(?P<id>\d{3,})\]\]:'),
+	'no_ref': re.compile(r'-\[\[(?P<id>\d{3,})\]\]'),
+	'quote': re.compile(r' *>\[\[(?P<id>\d{3,})\]\]'),
 	'footnote': re.compile(r' *\%\[\[(?P<id>\d{3,})\]\]'),
 	'add_ref': re.compile(r'\+\[\[(?P<id>\d{3,})\]\]'),
 	'link': re.compile(r'\[\[(?P<id>\d{3,})\]\]'),
 	'yaml_end_div': re.compile(r'^\.\.\.$'),
 	'yaml_div': re.compile(r'^\-\-\-$'),
+	'cross_ref': re.compile(r'\[\[(?P<id>\d{3,})\]\]:'),
 	'md_heading': re.compile(r'^#{1,3}'),
 	'ignore': re.compile(r'^(△|○)')
 }
@@ -31,7 +33,7 @@ rx_dict = {
 
 def _initialize_stack():
 	global z_count, z_stack, z_map
-	z_count = { "index": 0, "body": 0, "footnote": 0 }
+	z_count = { "index": 0, "body": 0, "footnote": 0, "quote": 0 }
 	z_stack = []
 	z_map = {} # maps zettel id's to paragraph or footnote sequence
 
@@ -71,7 +73,7 @@ def _z_add_to_stack(zettel_id, z_type):
 		z_count[z_type] += 1
 		path, mtime = _z_get_filepath(zettel_id)
 		z_map[zettel_id] = { "type": z_type, "ref": z_count[z_type], "path": path, "mtime": mtime }
-		if z_type in [ "body", "index" ]:
+		if z_type in [ "body", "index", "quote" ]:
 			z_stack.append(zettel_id) 
 	return z_map[zettel_id]
 
@@ -142,6 +144,7 @@ def parse_zettel(z_item, zettel_id):
     	lines = file_object.read().splitlines()
 
     for line in lines:
+    	insert_quotes = []
 		# at each line check for a match with a regex
         key, match = _parse_line(line)
 
@@ -165,6 +168,8 @@ def parse_zettel(z_item, zettel_id):
         	if (z_item["type"] == "body"):
 	        	data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
 	        	data.append('')
+	        if (z_item["type"] == "quote"):
+	        	data.append(_out_commented_id(zettel_id))
         	got_content = True
         	continue
 
@@ -172,7 +177,14 @@ def parse_zettel(z_item, zettel_id):
         	if (z_item["type"] == "body"):
 	        	data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
 	        	data.append('')
+	        if (z_item["type"] == "quote"):
+	        	data.append(_out_commented_id(zettel_id))
         	got_content = True
+
+        if key == 'quote':
+        	link = match.group('id')
+        	insert_quotes.append(link)
+        	line = rx_dict["quote"].sub("", line)
 
         if key == 'footnote':
             link = match.group('id')
@@ -184,11 +196,13 @@ def parse_zettel(z_item, zettel_id):
             link = match.group('id')
             _z_add_to_stack(link, "body")
 
+        if key == 'cross_ref':
+            link = match.group('id')
+            line = rx_dict["cross_ref"].sub(_out_commented_id(link), line)
 
         if key == 'no_ref':
             link = match.group('id')
             line = rx_dict["no_ref"].sub(_out_commented_id(link), line)
-
 
         if key == 'link':
             link = match.group('id')
@@ -197,6 +211,12 @@ def parse_zettel(z_item, zettel_id):
 
        	if got_content:
 	       	data.append(line)
+
+       	if insert_quotes is not []:
+       		for i in insert_quotes:
+       			_z_add_to_stack(link, "quote")					# add to stack...
+       			insert_data = parse_zettel(z_map[link], link)
+       			data = data + ['\n'] + insert_data 				# ...but insert immediately after line
 
     return data
 
@@ -223,7 +243,7 @@ def parse_index(pathname):
 		while len(z_stack) > c:
 			print ("zettel id " + z_stack[c])
 			d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
-			if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index"):
+			if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index") and not z_map[z_stack[c]]["type"] in [ "quote" ]:
 				for l in d:
 					f_out.write("%s\n" % l)
 			c += 1
