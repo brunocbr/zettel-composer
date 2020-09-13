@@ -6,6 +6,7 @@
 
 import re
 from glob import glob
+from collections import OrderedDict
 import os, time, sys, getopt
 
 options = {
@@ -17,19 +18,18 @@ options = {
 	"suppress-index": False
 }
 
-rx_dict = {
-	'no_ref': re.compile(r'-\[\[(?P<id>\d{3,})\]\]'),
-	'quote': re.compile(r' *>\[\[(?P<id>\d{3,})\]\]'),
-	'footnote': re.compile(r' *\%\[\[(?P<id>\d{3,})\]\]'),
-	'add_ref': re.compile(r'\+\[\[(?P<id>\d{3,})\]\]'),
-	'link': re.compile(r'\[\[(?P<id>\d{3,})\]\]'),
-	'yaml_end_div': re.compile(r'^\.\.\.$'),
-	'yaml_div': re.compile(r'^\-\-\-$'),
-	'cross_ref': re.compile(r'\[\[(?P<id>\d{3,})\]\]:'),
-	'md_heading': re.compile(r'^#{1,3}'),
-	'ignore': re.compile(r'^(△|○)')
-}
-
+rx_dict = OrderedDict([
+	('ignore', re.compile(r'^(△|○)')),
+	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),
+	('quote', re.compile(r' *>\[\[(?P<id>\d{3,})\]\]')),
+	('cross_ref', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),
+	('footnote', re.compile(r' *\%\[\[(?P<id>\d{3,})\]\]')),
+	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')),
+	('link', re.compile(r'\[\[(?P<id>\d{3,})\]\]')),
+	('yaml_end_div', re.compile(r'^\.\.\.$')),
+	('yaml_div', re.compile(r'^\-\-\-$')),
+	('md_heading', re.compile(r'^#{1,3}'))
+])
 
 def _initialize_stack():
 	global z_count, z_stack, z_map
