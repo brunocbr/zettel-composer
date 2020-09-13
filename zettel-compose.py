@@ -214,7 +214,7 @@ def parse_zettel(z_item, zettel_id):
        		for i in insert_quotes:
        			_z_add_to_stack(link, "quote")					# add to stack...
        			insert_data = parse_zettel(z_map[link], link)
-       			data = data + insert_data 						# ...but insert immediately after line
+       			data = data + ['\n'] + insert_data 						# ...but insert immediately after line
 
     return data
 
