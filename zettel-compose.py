@@ -167,7 +167,6 @@ def parse_zettel(z_item, zettel_id):
         	data.append('')
         	if (z_item["type"] == "body"):
 	        	data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
-	        	data.append('')
 	        if (z_item["type"] == "quote"):
 	        	data.append(_out_commented_id(zettel_id))
         	got_content = True
@@ -176,7 +175,6 @@ def parse_zettel(z_item, zettel_id):
         if (not line == '') and not got_content:
         	if (z_item["type"] == "body"):
 	        	data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
-	        	data.append('')
 	        if (z_item["type"] == "quote"):
 	        	data.append(_out_commented_id(zettel_id))
         	got_content = True
@@ -216,7 +214,7 @@ def parse_zettel(z_item, zettel_id):
        		for i in insert_quotes:
        			_z_add_to_stack(link, "quote")					# add to stack...
        			insert_data = parse_zettel(z_map[link], link)
-       			data = data + ['\n'] + insert_data 				# ...but insert immediately after line
+       			data = data + insert_data 						# ...but insert immediately after line
 
     return data
 
