@@ -15,14 +15,15 @@ options = {
 	"watch": False,
 	"sleep-time": 2,
 	"output": "zettel-compose.md",
-	"suppress-index": False
+	"suppress-index": False,
+	"only-link-from-index": False
 }
 
 rx_dict = OrderedDict([
 	('ignore', re.compile(r'^(△|○)')),
+	('cross_ref', re.compile(r'^\[\[(?P<id>\d{3,})\]\]')),
 	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),
 	('quote', re.compile(r' *>\[\[(?P<id>\d{3,})\]\]')),
-	('cross_ref', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),
 	('footnote', re.compile(r' *\%\[\[(?P<id>\d{3,})\]\]')),
 	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')),
 	('link', re.compile(r'\[\[(?P<id>\d{3,})\]\]')),
@@ -133,6 +134,8 @@ def parse_zettel(z_item, zettel_id):
         Parsed data
 
     """
+    global options
+
     filepath = z_item["path"]
 
     yaml_divert = False
@@ -204,8 +207,11 @@ def parse_zettel(z_item, zettel_id):
 
         if key == 'link':
             link = match.group('id')
-            _z_add_to_stack(link, "body")
-            line = rx_dict["link"].sub(_out_link(z_map[link]["ref"], link), line)
+       	    if (z_item["type"] == "index") or (options["only-link-from-index"] is not True):
+	            _z_add_to_stack(link, "body")
+	            line = rx_dict["link"].sub(_out_link(z_map[link]["ref"], link), line)
+    	    else:
+    	    	line = rx_dict["link"].sub(_out_commented_id(link), line)
 
        	if got_content:
 	       	data.append(line)
@@ -256,7 +262,7 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'O:H:s:WnS', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'suppress-index'])
+useroptions, infile = getopt.getopt(sys.argv[1:], 'O:H:s:WnSI', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'suppress-index'])
 
 for opt, arg in useroptions:
 	if opt in ('-O', '--output='):
@@ -271,6 +277,8 @@ for opt, arg in useroptions:
 		options["no-paragraph-headings"] = True
 	elif opt in ('-S', '--suppress-index'):
 		options["suppress-index"] = True
+	elif opt in ('-I'):
+		options["only-link-from-index"] = True
 
 index_filename = infile[0]
 print "Processing file " + infile[0]
