@@ -34,7 +34,7 @@ rx_dict = OrderedDict([
 
 def _initialize_stack():
 	global z_count, z_stack, z_map
-	z_count = { "index": 0, "body": 0, "footnote": 0, "quote": 0 }
+	z_count = { "index": 0, "body": 0, "footnote": 0, "quote": 0, "sequential": 0 }
 	z_stack = []
 	z_map = {} # maps zettel id's to paragraph or footnote sequence
 
@@ -140,6 +140,7 @@ def parse_zettel(z_item, zettel_id):
 
     yaml_divert = False
     got_content = False
+    insert_sequence = []
 
     data = [] # create an empty list to collect the data
     # open the file and read through it line by line
@@ -170,7 +171,7 @@ def parse_zettel(z_item, zettel_id):
         	data.append('')
         	if (z_item["type"] == "body"):
 	        	data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
-	        if (z_item["type"] == "quote"):
+	        if (z_item["type"] in [ "quote", "sequential" ]):
 	        	data.append(_out_commented_id(zettel_id))
         	got_content = True
         	continue
@@ -178,7 +179,7 @@ def parse_zettel(z_item, zettel_id):
         if (not line == '') and not got_content:
         	if (z_item["type"] == "body"):
 	        	data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
-	        if (z_item["type"] == "quote"):
+	        if (z_item["type"] in [ "quote", "sequential" ]):
 	        	data.append(_out_commented_id(zettel_id))
         	got_content = True
 
@@ -192,10 +193,10 @@ def parse_zettel(z_item, zettel_id):
             _z_add_to_stack(link, "footnote")
 
 
-        # TODO: +[[id]] is actually intended to immediately include a file
         if key == 'add_ref':
             link = match.group('id')
-            _z_add_to_stack(link, "body")
+            insert_sequence.append(link)
+            line = rx_dict["add_ref"].sub(_out_commented_id(link), line)
 
         if key == 'cross_ref':
             link = match.group('id')
@@ -222,6 +223,11 @@ def parse_zettel(z_item, zettel_id):
        			insert_data = parse_zettel(z_map[link], link)
        			data = data + ['\n'] + insert_data 						# ...but insert immediately after line
 
+    if insert_sequence is not []:
+    	for i in insert_sequence:
+    		_z_add_to_stack(i, "sequential")
+    		insert_data = parse_zettel(z_map[i], i)
+    		data = data + ['\n'] + insert_data
     return data
 
 def get_first_modified():
