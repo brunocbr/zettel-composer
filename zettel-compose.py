@@ -183,8 +183,9 @@ def parse_zettel(z_item, zettel_id):
         # our paragraph heading after, not before it
 
         if (key == "md_heading") and not got_content:
-        	data.append(line)
-        	data.append('')
+        	if (z_item["type"] != "quote"): # headings in citation notes are for handouts only
+	        	data.append(line)
+	        	data.append('')
         	if (z_item["type"] == "body"):
         		data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
         	elif (z_item["type"] == "quote"):
