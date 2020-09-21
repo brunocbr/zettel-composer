@@ -186,13 +186,13 @@ def parse_zettel(z_item, zettel_id):
         	if (z_item["type"] != "quote"): # headings in citation notes are for handouts only
 	        	data.append(line)
 	        	data.append('')
+	        got_content = True
         	if (z_item["type"] == "body"):
         		data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
         	elif (z_item["type"] == "quote"):
-        		data.append(_out_text_quote(z_item["ref"], zettel_id))
+        		got_content = False
         	elif (z_item["type"] == "sequential"):
         		data.append(_out_commented_id(zettel_id))
-        	got_content = True
         	continue
 
         if (not line == '') and not got_content:
