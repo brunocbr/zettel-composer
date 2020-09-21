@@ -16,7 +16,8 @@ options = {
 	"sleep-time": 2,
 	"output": "zettel-compose.md",
 	"suppress-index": False,
-	"only-link-from-index": False
+    "only-link-from-index": False,
+    "numbered-quotes": False
 }
 
 rx_dict = OrderedDict([
@@ -75,7 +76,7 @@ def _z_add_to_stack(zettel_id, z_type):
 		path, mtime = _z_get_filepath(zettel_id)
 		z_map[zettel_id] = { "type": z_type, "ref": z_count[z_type], "path": path, "mtime": mtime }
 		if z_type in [ "body", "index", "quote" ]:
-			z_stack.append(zettel_id) 
+			z_stack.append(zettel_id)
 	return z_map[zettel_id]
 
 def _out_link(ref, id):
@@ -91,6 +92,12 @@ def _out_link(ref, id):
 		else:
 			return " (**" + str(ref) + "**)"
 
+def _out_quoteref(ref, id):
+    """
+    Formatted output for text reference
+	"""
+    global options
+    return "**T" + str(ref) + "**"
 
 def _out_paragraph_heading(ref, zettel_id):
 	"""
@@ -101,7 +108,7 @@ def _out_paragraph_heading(ref, zettel_id):
 		return "{>> = " + str(zettel_id) + " = <<}"
 	else:
 		if options["heading-identifier"]:
-			return "#### " + str(ref) + " {>> = " + str(zettel_id) + " <<}" + " {#" + options["heading-identifier"] + str(ref) + "}" 
+			return "#### " + str(ref) + " {>> = " + str(zettel_id) + " <<}" + " {#" + options["heading-identifier"] + str(ref) + "}"
 		else:
 			return "#### " + str(ref)
 
@@ -111,6 +118,15 @@ def _out_commented_id(zettel_id):
 	"""
 	return "{>> " + str(zettel_id) + " <<}"
 
+def _out_text_quote(ref, zettel_id):
+    """
+    Formatted output for quote preamble
+    """
+    global options
+    if options["numbered-quotes"]:
+        return "> **T" + str(ref) + "**{>> = " + str(zettel_id) + " <<}:  "
+    else:
+        return "{>> " + str(zettel_id) + " <<}"
 
 def _parse_line(line):
 	for key, rx in rx_dict.items():
@@ -134,7 +150,7 @@ def parse_zettel(z_item, zettel_id):
         Parsed data
 
     """
-    global options
+    global options, z_map
 
     filepath = z_item["path"]
 
@@ -163,24 +179,29 @@ def parse_zettel(z_item, zettel_id):
         if key == "ignore":
         	continue
 
-        # if the first content in a note is a heading, then insert 
+        # if the first content in a note is a heading, then insert
         # our paragraph heading after, not before it
 
         if (key == "md_heading") and not got_content:
         	data.append(line)
         	data.append('')
-        	if (z_item["type"] == "body"):
-	        	data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
-	        if (z_item["type"] in [ "quote", "sequential" ]):
-	        	data.append(_out_commented_id(zettel_id))
-        	got_content = True
-        	continue
+	        if (not line == '') and not got_content:
+	        	if (z_item["type"] == "body"):
+	        		data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
+	        	elif (z_item["type"] == "quote"):
+	        		data.append(_out_text_quote(z_item["ref"], zettel_id))
+	        	elif (z_item["type"] == "sequential"):
+	        		data.append(_out_commented_id(zettel_id))
+	        	got_content = True
+	        	continue
 
         if (not line == '') and not got_content:
         	if (z_item["type"] == "body"):
-	        	data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
-	        if (z_item["type"] in [ "quote", "sequential" ]):
-	        	data.append(_out_commented_id(zettel_id))
+        		data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
+        	elif (z_item["type"] == "quote"):
+        		data.append(_out_text_quote(z_item["ref"], zettel_id))
+        	elif (z_item["type"] == "sequential"):
+        		data.append(_out_commented_id(zettel_id))	        	
         	got_content = True
 
         if key == 'quote':
@@ -191,7 +212,6 @@ def parse_zettel(z_item, zettel_id):
         if key == 'footnote':
             link = match.group('id')
             _z_add_to_stack(link, "footnote")
-
 
         if key == 'add_ref':
             link = match.group('id')
@@ -208,7 +228,9 @@ def parse_zettel(z_item, zettel_id):
 
         if key == 'link':
             link = match.group('id')
-       	    if (z_item["type"] == "index") or (options["only-link-from-index"] is not True):
+            if (link in z_map) and (z_map[link]["type"] == "quote"):
+                line = rx_dict["link"].sub(_out_quoteref(z_map[link]["ref"], link), line)
+       	    elif (z_item["type"] == "index") or (options["only-link-from-index"] is not True):
 	            _z_add_to_stack(link, "body")
 	            line = rx_dict["link"].sub(_out_link(z_map[link]["ref"], link), line)
     	    else:
@@ -245,8 +267,6 @@ def get_first_modified():
 
 def parse_index(pathname):
 	global z_stack, z_map, options
-
-	_initialize_stack()
 	_z_set_index(pathname)
 	c = 0
 	with open(options["output"], "w") as f_out:
@@ -268,7 +288,9 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'O:H:s:WnSI', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'suppress-index'])
+useroptions, infile = getopt.getopt(sys.argv[1:], 'O:H:s:WnSITt:', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'suppress-index'])
+
+_initialize_stack()
 
 for opt, arg in useroptions:
 	if opt in ('-O', '--output='):
@@ -285,6 +307,10 @@ for opt, arg in useroptions:
 		options["suppress-index"] = True
 	elif opt in ('-I'):
 		options["only-link-from-index"] = True
+	elif opt in ('-T'):
+		options["numbered-quotes"] = True
+	elif opt in ('-t'):
+		z_count["quote"] = (int(arg) - 1)
 
 index_filename = infile[0]
 print "Processing file " + infile[0]
