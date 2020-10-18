@@ -215,8 +215,8 @@ def parse_zettel(z_item, zettel_id):
 
         if key == 'add_ref':
             link = match.group('id')
-            insert_sequence.append(link)
-            line = rx_dict["add_ref"].sub(_out_commented_id(link), line)
+            line = rx_dict["add_ref"].sub("", line)
+
 
         if key == 'cross_ref':
             link = match.group('id')
@@ -239,17 +239,16 @@ def parse_zettel(z_item, zettel_id):
        	if got_content:
 	       	data.append(line)
 
+		if key == 'add_ref':
+			_z_add_to_stack(link, "sequential")
+			data = data + ['\n'] + parse_zettel(z_map[link], link)
+
        	if insert_quotes is not []:
        		for i in insert_quotes:
        			_z_add_to_stack(link, "quote")					# add to stack...
        			insert_data = parse_zettel(z_map[link], link)
        			data = data + ['\n'] + insert_data 						# ...but insert immediately after line
 
-	    if insert_sequence is not []:
-	    	for i in insert_sequence:
-	    		_z_add_to_stack(i, "sequential")
-	    		insert_data = parse_zettel(z_map[i], i)
-	    		data = data + ['\n'] + insert_data
     return data
 
 def get_first_modified():
