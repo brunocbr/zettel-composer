@@ -24,9 +24,9 @@ rx_dict = OrderedDict([
 	('ignore', re.compile(r'^(△|○)')),
 	('cross_ref', re.compile(r'^\[\[(?P<id>\d{3,})\]\]')),
 	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),
-	('quote', re.compile(r' *>\[\[(?P<id>\d{3,})\]\]')),
+	('quote', re.compile(r' *>\[\[(?P<id>\d{3,})\]\]')), # insert quote immediately
 	('footnote', re.compile(r' *\%\[\[(?P<id>\d{3,})\]\]')),
-	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')),
+	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')), # insert note immediately
 	('link', re.compile(r'\[\[(?P<id>\d{3,})\]\]')),
 	('yaml_end_div', re.compile(r'^\.\.\.$')),
 	('yaml_div', re.compile(r'^\-\-\-$')),
@@ -245,11 +245,11 @@ def parse_zettel(z_item, zettel_id):
        			insert_data = parse_zettel(z_map[link], link)
        			data = data + ['\n'] + insert_data 						# ...but insert immediately after line
 
-    if insert_sequence is not []:
-    	for i in insert_sequence:
-    		_z_add_to_stack(i, "sequential")
-    		insert_data = parse_zettel(z_map[i], i)
-    		data = data + ['\n'] + insert_data
+	    if insert_sequence is not []:
+	    	for i in insert_sequence:
+	    		_z_add_to_stack(i, "sequential")
+	    		insert_data = parse_zettel(z_map[i], i)
+	    		data = data + ['\n'] + insert_data
     return data
 
 def get_first_modified():
