@@ -23,6 +23,8 @@ options = {
 rx_dict = OrderedDict([
 	('ignore', re.compile(r'^(△|○)')),
 	('cross_ref', re.compile(r'^\[\[(?P<id>\d{3,})\]\]')),
+	('pandoc_cite_noauthor', re.compile(r'-@\[\[(?P<id>\d{3,})\]\]')),
+	('pandoc_cite', re.compile(r'@\[\[(?P<id>\d{3,})\]\]')),
 	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),
 	('quote', re.compile(r' *>\[\[(?P<id>\d{3,})\]\]')), # insert quote immediately
 	('footnote', re.compile(r' *\%\[\[(?P<id>\d{3,})\]\]')),
@@ -32,6 +34,11 @@ rx_dict = OrderedDict([
 	('yaml_div', re.compile(r'^\-\-\-$')),
 	('md_heading', re.compile(r'^#{1,3}'))
 ])
+
+fields_dict = {
+	"citekey": "citekey",
+	"loc": "loc"
+}
 
 def _initialize_stack():
 	global z_count, z_stack, z_map
