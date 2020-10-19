@@ -22,6 +22,7 @@ options = {
 
 rx_dict = OrderedDict([
 	('ignore', re.compile(r'^(△|○)')),
+	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),
 	('cross_ref', re.compile(r'^\[\[(?P<id>\d{3,})\]\]')),
 	('pandoc_cite_noauthor', re.compile(r'-@\[\[(?P<id>\d{3,})\]\]')),
 	('pandoc_cite_inline', re.compile(r'@@\[\[(?P<id>\d{3,})\]\]')),
@@ -243,9 +244,9 @@ def parse_zettel(z_item, zettel_id):
             chunk = rx_dict["add_ref"].sub("", chunk)
 
 
-        if key == 'cross_ref':
+        if key in [ 'cross_ref', 'cross_ref_alt' ]:
             link = match.group('id')
-            chunk = rx_dict["cross_ref"].sub(_out_commented_id(link), chunk)
+            chunk = rx_dict[key].sub(_out_commented_id(link), chunk)
 
         if key == 'no_ref':
             link = match.group('id')
