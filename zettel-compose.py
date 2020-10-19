@@ -39,7 +39,7 @@ rx_dict = OrderedDict([
 
 fields_dict = {
 	"citekey": re.compile(r'^citekey:[ \t]*(?P<id>[A-Za-z\d:]+) *$'),
-	"loc": re.compile(r'loc:[ \t]*(?P<id>[\d-]+) *$')
+	"loc": re.compile(r'^loc:[ \t]*(?P<id>[\d-]+) *$')
 }
 
 def _initialize_stack():
@@ -365,9 +365,6 @@ def watch_folder():
 useroptions, infile = getopt.getopt(sys.argv[1:], 'O:H:s:WnSITt:', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'suppress-index'])
 
 _initialize_stack()
-
-
-
 
 for opt, arg in useroptions:
 	if opt in ('-O', '--output='):
