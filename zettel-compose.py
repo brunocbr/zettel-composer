@@ -42,7 +42,7 @@ fields_dict = {
 
 def _initialize_stack():
 	global z_count, z_stack, z_map
-	z_count = { "index": 0, "body": 0, "footnote": 0, "quote": 0, "sequential": 0, "cite": 0 }
+	z_count = { "index": 0, "body": 0, "footnote": 0, "quote": 0, "sequential": 0, "citation": 0 }
 	z_stack = []
 	z_map = {} # maps zettel id's to paragraph or footnote sequence
 
@@ -82,7 +82,7 @@ def _z_add_to_stack(zettel_id, z_type):
 		z_count[z_type] += 1
 		path, mtime = _z_get_filepath(zettel_id)
 		z_map[zettel_id] = { "type": z_type, "ref": z_count[z_type], "path": path, "mtime": mtime }
-		if z_type in [ "body", "index", "quote", "cite" ]:
+		if z_type in [ "body", "index", "quote", "citation" ]:
 			z_stack.append(zettel_id)
 	return z_map[zettel_id]
 
@@ -139,8 +139,8 @@ def _parse_line(line, thedict):
 	for key, rx in thedict.items():
 		match = rx.search(line)
 		if match:
-			return key, match
-	return None, None
+			return key, match, match.end
+	return None, None, None
 
 
 def _pandoc_citetext(zettel_id):
@@ -156,7 +156,7 @@ def _pandoc_citetext(zettel_id):
 		lines = file_obj.read().splitlines()
 
 	for line in lines:
-		key, match = _parse_line(line, fields_dict)
+		key, match, end = _parse_line(line, fields_dict)
 		if key == "citekey":
 			citekey = match.group('id')
 		if key == "loc":
@@ -209,8 +209,9 @@ def parse_zettel(z_item, zettel_id):
 
     for line in lines:
     	insert_quotes = []
+    	insert_sequence = []
 		# at each line check for a match with a regex
-        key, match = _parse_line(line, rx_dict)
+        key, match, end = _parse_line(line, rx_dict)
 
         if yaml_divert:
 	       	yaml_divert = not key in ["yaml_div", "yaml_end_div"]
@@ -255,12 +256,12 @@ def parse_zettel(z_item, zettel_id):
 
         if key == 'pandoc_cite':
             link = match.group('id')
-            _z_add_to_stack(link, "cite")
+            _z_add_to_stack(link, "citation")
             line = rx_dict["pandoc_cite"].sub(_pandoc_cite(link) + _out_commented_id(link, "= "), line)
 
         if key == 'pandoc_cite_noauthor':
             link = match.group('id')
-            _z_add_to_stack(link, "cite")            
+            _z_add_to_stack(link, "citation")            
             line = rx_dict["pandoc_cite_noauthor"].sub(_pandoc_cite_noauthor(link) + _out_commented_id(link, "= "), line)
 
         if key == 'footnote':
@@ -269,6 +270,7 @@ def parse_zettel(z_item, zettel_id):
 
         if key == 'add_ref':
             link = match.group('id')
+            insert_sequence.append(link)
             line = rx_dict["add_ref"].sub("", line)
 
 
@@ -293,14 +295,15 @@ def parse_zettel(z_item, zettel_id):
        	if got_content:
 	       	data.append(line)
 
-		if key == 'add_ref':
-			_z_add_to_stack(link, "sequential")
-			data = data + ['\n'] + parse_zettel(z_map[link], link)
+		if insert_sequence is not []:
+			for i in insert_sequence:
+				_z_add_to_stack(link, "sequential")
+				data = data + ['\n'] + parse_zettel(z_map[i], i)
 
        	if insert_quotes is not []:
        		for i in insert_quotes:
        			_z_add_to_stack(link, "quote")					# add to stack...
-       			insert_data = parse_zettel(z_map[link], link)
+       			insert_data = parse_zettel(z_map[i], i)
        			data = data + ['\n'] + insert_data 						# ...but insert immediately after line
 
     return data
@@ -326,7 +329,7 @@ def parse_index(pathname):
 		while len(z_stack) > c:
 			print ("zettel id " + z_stack[c])
 			d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
-			if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index") and not z_map[z_stack[c]]["type"] in [ "quote" ]:
+			if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index") and not z_map[z_stack[c]]["type"] in [ "quote", "citation" ]:
 				for l in d:
 					f_out.write("%s\n" % l)
 			c += 1
