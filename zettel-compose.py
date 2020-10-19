@@ -359,6 +359,7 @@ def watch_folder():
 		modified = get_first_modified()
 		if modified is not None:
 			print "note " + str(modified) + " id " + z_stack[modified] + " was modified"
+			_initialize_stack()
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
