@@ -140,7 +140,7 @@ def _parse_line(line, thedict):
 	for key, rx in thedict.items():
 		match = rx.search(line)
 		if match:
-			return key, match, match.end
+			return key, match, match.end()
 	return None, None, None
 
 
@@ -207,6 +207,64 @@ def parse_zettel(z_item, zettel_id):
 
     data = [] # create an empty list to collect the data
     # open the file and read through it line by line
+
+
+    def parse_chunk(chunk):
+        key, match, end = _parse_line(chunk, rx_dict)
+
+        if (key is None):
+            return chunk
+
+        if key == 'quote':
+        	link = match.group('id')
+        	insert_quotes.append(link)
+        	chunk = rx_dict["quote"].sub("", chunk)
+
+        if key == 'pandoc_cite':
+            link = match.group('id')
+            _z_add_to_stack(link, "citation")
+            chunk = rx_dict["pandoc_cite"].sub(_pandoc_cite(link), chunk)
+
+        if key == 'pandoc_cite_inchunk':
+            link = match.group('id')
+            _z_add_to_stack(link, "citation")
+            chunk = rx_dict["pandoc_cite_inline"].sub(_pandoc_cite(link, parenthetical = False), chunk)
+
+        if key == 'pandoc_cite_noauthor':
+            link = match.group('id')
+            _z_add_to_stack(link, "citation")            
+            chunk = rx_dict["pandoc_cite_noauthor"].sub(_pandoc_cite_noauthor(link), chunk)
+
+        if key == 'footnote':
+            link = match.group('id')
+            _z_add_to_stack(link, "footnote")
+
+        if key == 'add_ref':
+            link = match.group('id')
+            insert_sequence.append(link)
+            chunk = rx_dict["add_ref"].sub("", chunk)
+
+
+        if key == 'cross_ref':
+            link = match.group('id')
+            chunk = rx_dict["cross_ref"].sub(_out_commented_id(link), chunk)
+
+        if key == 'no_ref':
+            link = match.group('id')
+            chunk = rx_dict["no_ref"].sub(_out_commented_id(link), chunk)
+
+        if key == 'link':
+            link = match.group('id')
+            if (link in z_map) and (z_map[link]["type"] == "quote"):
+                chunk = rx_dict["link"].sub(_out_quoteref(z_map[link]["ref"], link), chunk)
+       	    elif (z_item["type"] == "index") or (options["only-link-from-index"] is not True):
+	            _z_add_to_stack(link, "body")
+	            chunk = rx_dict["link"].sub(_out_link(z_map[link]["ref"], link), chunk)
+    	    else:
+    	    	chunk = rx_dict["link"].sub(_out_commented_id(link), chunk)
+
+       	return chunk[:end] + parse_chunk(chunk[end:])
+
     with open(filepath, 'r') as file_object:
     	lines = file_object.read().splitlines()
 
@@ -252,65 +310,19 @@ def parse_zettel(z_item, zettel_id):
         		data.append(_out_commented_id(zettel_id))	        	
         	got_content = True
 
-        if key == 'quote':
-        	link = match.group('id')
-        	insert_quotes.append(link)
-        	line = rx_dict["quote"].sub("", line)
-
-        if key == 'pandoc_cite':
-            link = match.group('id')
-            _z_add_to_stack(link, "citation")
-            line = rx_dict["pandoc_cite"].sub(_pandoc_cite(link) + _out_commented_id(link, "= "), line)
-
-        if key == 'pandoc_cite_inline':
-            link = match.group('id')
-            _z_add_to_stack(link, "citation")
-            line = rx_dict["pandoc_cite_inline"].sub(_pandoc_cite(link, parenthetical = False) + _out_commented_id(link, "= "), line)
-
-        if key == 'pandoc_cite_noauthor':
-            link = match.group('id')
-            _z_add_to_stack(link, "citation")            
-            line = rx_dict["pandoc_cite_noauthor"].sub(_pandoc_cite_noauthor(link) + _out_commented_id(link, "= "), line)
-
-        if key == 'footnote':
-            link = match.group('id')
-            _z_add_to_stack(link, "footnote")
-
-        if key == 'add_ref':
-            link = match.group('id')
-            insert_sequence.append(link)
-            line = rx_dict["add_ref"].sub("", line)
-
-
-        if key == 'cross_ref':
-            link = match.group('id')
-            line = rx_dict["cross_ref"].sub(_out_commented_id(link), line)
-
-        if key == 'no_ref':
-            link = match.group('id')
-            line = rx_dict["no_ref"].sub(_out_commented_id(link), line)
-
-        if key == 'link':
-            link = match.group('id')
-            if (link in z_map) and (z_map[link]["type"] == "quote"):
-                line = rx_dict["link"].sub(_out_quoteref(z_map[link]["ref"], link), line)
-       	    elif (z_item["type"] == "index") or (options["only-link-from-index"] is not True):
-	            _z_add_to_stack(link, "body")
-	            line = rx_dict["link"].sub(_out_link(z_map[link]["ref"], link), line)
-    	    else:
-    	    	line = rx_dict["link"].sub(_out_commented_id(link), line)
+        line = parse_chunk(line)
 
        	if got_content:
 	       	data.append(line)
 
 		if insert_sequence is not []:
 			for i in insert_sequence:
-				_z_add_to_stack(link, "sequential")
+				_z_add_to_stack(i, "sequential")
 				data = data + ['\n'] + parse_zettel(z_map[i], i)
 
        	if insert_quotes is not []:
        		for i in insert_quotes:
-       			_z_add_to_stack(link, "quote")					# add to stack...
+       			_z_add_to_stack(i, "quote")					# add to stack...
        			insert_data = parse_zettel(z_map[i], i)
        			data = data + ['\n'] + insert_data 						# ...but insert immediately after line
 
