@@ -36,13 +36,13 @@ rx_dict = OrderedDict([
 ])
 
 fields_dict = {
-	"citekey": "citekey",
-	"loc": "loc"
+	"citekey": re.compile(r'^citekey:[ \t]*(?P<id>[A-Za-z\d:]+) *$'),
+	"loc": re.compile(r'loc:[ \t]*(?P<id>[\d-]+) *$')
 }
 
 def _initialize_stack():
 	global z_count, z_stack, z_map
-	z_count = { "index": 0, "body": 0, "footnote": 0, "quote": 0, "sequential": 0 }
+	z_count = { "index": 0, "body": 0, "footnote": 0, "quote": 0, "sequential": 0, "cite": 0 }
 	z_stack = []
 	z_map = {} # maps zettel id's to paragraph or footnote sequence
 
@@ -82,7 +82,7 @@ def _z_add_to_stack(zettel_id, z_type):
 		z_count[z_type] += 1
 		path, mtime = _z_get_filepath(zettel_id)
 		z_map[zettel_id] = { "type": z_type, "ref": z_count[z_type], "path": path, "mtime": mtime }
-		if z_type in [ "body", "index", "quote" ]:
+		if z_type in [ "body", "index", "quote", "cite" ]:
 			z_stack.append(zettel_id)
 	return z_map[zettel_id]
 
@@ -119,11 +119,11 @@ def _out_paragraph_heading(ref, zettel_id):
 		else:
 			return "#### " + str(ref)
 
-def _out_commented_id(zettel_id):
+def _out_commented_id(zettel_id, pre = ""):
 	"""
 	Formatted output for -[[id]]
 	"""
-	return "{>> " + str(zettel_id) + " <<}"
+	return "{>> " + pre + str(zettel_id) + " <<}"
 
 def _out_text_quote(ref, zettel_id):
     """
@@ -135,12 +135,49 @@ def _out_text_quote(ref, zettel_id):
     else:
         return "{>> " + str(zettel_id) + " <<}"
 
-def _parse_line(line):
-	for key, rx in rx_dict.items():
+def _parse_line(line, thedict):
+	for key, rx in thedict.items():
 		match = rx.search(line)
 		if match:
 			return key, match
 	return None, None
+
+
+def _pandoc_citetext(zettel_id):
+	"""
+	Get reference for pandoc-style citation
+	"""
+	global fields_dict
+	citekey = None
+	loc = None
+	filepath, mtime = _z_get_filepath(zettel_id)
+
+	with open(filepath, 'r') as file_obj:
+		lines = file_obj.read().splitlines()
+
+	for line in lines:
+		key, match = _parse_line(line, fields_dict)
+		if key == "citekey":
+			citekey = match.group('id')
+		if key == "loc":
+			loc = match.group('id')
+
+	citetext = None
+	if (citekey and loc):
+		citetext = citekey + ", " + loc
+	elif (citekey):
+		citetext = citekey
+	return citetext
+
+def _pandoc_cite(zettel_id):
+	citetext = _pandoc_citetext(zettel_id)
+	if citetext:
+		return "[@" + citetext + "]"
+
+def _pandoc_cite_noauthor(zettel_id):
+	citetext = _pandoc_citetext(zettel_id)
+	if citetext:
+		return "[-@" + citetext + "]"
 
 def parse_zettel(z_item, zettel_id):
     """
@@ -173,7 +210,7 @@ def parse_zettel(z_item, zettel_id):
     for line in lines:
     	insert_quotes = []
 		# at each line check for a match with a regex
-        key, match = _parse_line(line)
+        key, match = _parse_line(line, rx_dict)
 
         if yaml_divert:
 	       	yaml_divert = not key in ["yaml_div", "yaml_end_div"]
@@ -215,6 +252,16 @@ def parse_zettel(z_item, zettel_id):
         	link = match.group('id')
         	insert_quotes.append(link)
         	line = rx_dict["quote"].sub("", line)
+
+        if key == 'pandoc_cite':
+            link = match.group('id')
+            _z_add_to_stack(link, "cite")
+            line = rx_dict["pandoc_cite"].sub(_pandoc_cite(link) + _out_commented_id(link, "= "), line)
+
+        if key == 'pandoc_cite_noauthor':
+            link = match.group('id')
+            _z_add_to_stack(link, "cite")            
+            line = rx_dict["pandoc_cite_noauthor"].sub(_pandoc_cite_noauthor(link) + _out_commented_id(link, "= "), line)
 
         if key == 'footnote':
             link = match.group('id')
@@ -297,6 +344,9 @@ def watch_folder():
 useroptions, infile = getopt.getopt(sys.argv[1:], 'O:H:s:WnSITt:', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'suppress-index'])
 
 _initialize_stack()
+
+
+
 
 for opt, arg in useroptions:
 	if opt in ('-O', '--output='):
