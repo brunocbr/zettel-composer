@@ -24,6 +24,7 @@ rx_dict = OrderedDict([
 	('ignore', re.compile(r'^(△|○)')),
 	('cross_ref', re.compile(r'^\[\[(?P<id>\d{3,})\]\]')),
 	('pandoc_cite_noauthor', re.compile(r'-@\[\[(?P<id>\d{3,})\]\]')),
+	('pandoc_cite_inline', re.compile(r'@@\[\[(?P<id>\d{3,})\]\]')),
 	('pandoc_cite', re.compile(r'@\[\[(?P<id>\d{3,})\]\]')),
 	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),
 	('quote', re.compile(r' *>\[\[(?P<id>\d{3,})\]\]')), # insert quote immediately
@@ -169,10 +170,12 @@ def _pandoc_citetext(zettel_id):
 		citetext = citekey
 	return citetext
 
-def _pandoc_cite(zettel_id):
+def _pandoc_cite(zettel_id, parenthetical = True):
 	citetext = _pandoc_citetext(zettel_id)
-	if citetext:
+	if citetext and parenthetical:
 		return "[@" + citetext + "]"
+	elif citetext:
+		return "@" + citetext
 
 def _pandoc_cite_noauthor(zettel_id):
 	citetext = _pandoc_citetext(zettel_id)
@@ -258,6 +261,11 @@ def parse_zettel(z_item, zettel_id):
             link = match.group('id')
             _z_add_to_stack(link, "citation")
             line = rx_dict["pandoc_cite"].sub(_pandoc_cite(link) + _out_commented_id(link, "= "), line)
+
+        if key == 'pandoc_cite_inline':
+            link = match.group('id')
+            _z_add_to_stack(link, "citation")
+            line = rx_dict["pandoc_cite_inline"].sub(_pandoc_cite(link, parenthetical = False) + _out_commented_id(link, "= "), line)
 
         if key == 'pandoc_cite_noauthor':
             link = match.group('id')
