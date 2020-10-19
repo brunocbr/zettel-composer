@@ -206,8 +206,6 @@ def parse_zettel(z_item, zettel_id):
     insert_sequence = []
 
     data = [] # create an empty list to collect the data
-    # open the file and read through it line by line
-
 
     def parse_chunk(chunk):
         key, match, end = _parse_line(chunk, rx_dict)
