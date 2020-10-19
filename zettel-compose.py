@@ -308,9 +308,8 @@ def parse_zettel(z_item, zettel_id):
         		data.append(_out_commented_id(zettel_id))	        	
         	got_content = True
 
-        line = parse_chunk(line)
-
        	if got_content:
+       		line = parse_chunk(line)
 	       	data.append(line)
 
 		if insert_sequence is not []:
