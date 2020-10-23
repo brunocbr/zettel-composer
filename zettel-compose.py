@@ -34,7 +34,7 @@ rx_dict = OrderedDict([
 	('link', re.compile(r'\[\[(?P<id>\d{3,})\]\]')),
 	('yaml_end_div', re.compile(r'^\.\.\.$')),
 	('yaml_div', re.compile(r'^\-\-\-$')),
-	('md_heading', re.compile(r'^#{1,3}'))
+	('md_heading', re.compile(r'^#{1,5}[\s\w]'))
 ])
 
 fields_dict = {
@@ -84,7 +84,7 @@ def _z_add_to_stack(zettel_id, z_type):
 		z_count[z_type] += 1
 		path, mtime = _z_get_filepath(zettel_id)
 		z_map[zettel_id] = { "type": z_type, "ref": z_count[z_type], "path": path, "mtime": mtime }
-		if z_type in [ "body", "index", "quote", "citation" ]:
+		if z_type in [ "body", "index", "quote", "citation", "sequential" ]:
 			z_stack.append(zettel_id)
 	return z_map[zettel_id]
 
@@ -117,9 +117,9 @@ def _out_paragraph_heading(ref, zettel_id):
 		return "{>> = " + str(zettel_id) + " = <<}"
 	else:
 		if options["heading-identifier"]:
-			return "#### " + str(ref) + " {>> = " + str(zettel_id) + " <<}" + " {#" + options["heading-identifier"] + str(ref) + "}"
+			return "##### " + str(ref) + " {>> = " + str(zettel_id) + " <<}" + " {#" + options["heading-identifier"] + str(ref) + "}"
 		else:
-			return "#### " + str(ref)
+			return "##### " + str(ref)
 
 def _out_commented_id(zettel_id, pre = ""):
 	"""
