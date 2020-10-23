@@ -34,7 +34,7 @@ rx_dict = OrderedDict([
 	('link', re.compile(r'\[\[(?P<id>\d{3,})\]\]')),
 	('yaml_end_div', re.compile(r'^\.\.\.$')),
 	('yaml_div', re.compile(r'^\-\-\-$')),
-	('md_heading', re.compile(r'^#{1,5}[\s\w]'))
+	('md_heading', re.compile(r'^#{1,4}[\s\w]'))
 ])
 
 fields_dict = {
@@ -117,9 +117,9 @@ def _out_paragraph_heading(ref, zettel_id):
 		return "{>> = " + str(zettel_id) + " = <<}"
 	else:
 		if options["heading-identifier"]:
-			return "##### " + str(ref) + " {>> = " + str(zettel_id) + " <<}" + " {#" + options["heading-identifier"] + str(ref) + "}"
+			return "#### " + str(ref) + " {>> = " + str(zettel_id) + " <<}" + " {#" + options["heading-identifier"] + str(ref) + "}"
 		else:
-			return "##### " + str(ref)
+			return "#### " + str(ref)
 
 def _out_commented_id(zettel_id, pre = ""):
 	"""
