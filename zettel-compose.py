@@ -165,7 +165,7 @@ def _pandoc_citetext(zettel_id):
 			loc = match.group('id')
 
 	citetext = None
-	if (citekey and loc):
+	if (citekey and loc and loc != "0"):
 		citetext = citekey + ", " + loc
 	elif (citekey):
 		citetext = citekey
