@@ -226,7 +226,7 @@ def parse_zettel(z_item, zettel_id):
             _z_add_to_stack(link, "citation")
             left_chunk = rx_dict["pandoc_cite"].sub(_pandoc_cite(link), left_chunk)
 
-        if key == 'pandoc_cite_inchunk':
+        if key == 'pandoc_cite_inline':
             link = match.group('id')
             _z_add_to_stack(link, "citation")
             left_chunk = rx_dict["pandoc_cite_inline"].sub(_pandoc_cite(link, parenthetical = False), left_chunk)
