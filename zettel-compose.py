@@ -97,9 +97,9 @@ def _out_link(ref, id):
 		return " {>> [[" + str(id) + "]] <<}"
 	else:
 		if options["heading-identifier"]:
-			return " ([§ " + str(ref) + "](#" + options["heading-identifier"] + str(ref) + "))"
+			return " ([§" + str(ref) + "](#" + options["heading-identifier"] + str(ref) + "))"
 		else:
-			return " (§ " + str(ref) + ")"
+			return " (§" + str(ref) + ")"
 
 def _out_quoteref(ref, id):
     """
