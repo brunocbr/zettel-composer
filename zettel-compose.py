@@ -17,7 +17,8 @@ options = {
 	"output": "zettel-compose.md",
 	"suppress-index": False,
     "only-link-from-index": False,
-    "numbered-quotes": False
+    "numbered-quotes": False,
+    "verbose": False
 }
 
 rx_dict = OrderedDict([
@@ -345,14 +346,23 @@ def parse_index(pathname):
 	global z_stack, z_map, options
 	_z_set_index(pathname)
 	c = 0
-	with open(options["output"], "w") as f_out:
-		while len(z_stack) > c:
+
+	if options["output"] != '-':
+		f_out = open(options["output"], "w")
+	else:
+		f_out = sys.stdout
+
+	while len(z_stack) > c:
+		if options["verbose"]:
 			print ("zettel id " + z_stack[c])
-			d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
-			if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index") and not z_map[z_stack[c]]["type"] in [ "quote", "citation" ]:
-				for l in d:
-					f_out.write("%s\n" % l)
-			c += 1
+		d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
+		if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index") and not z_map[z_stack[c]]["type"] in [ "quote", "citation" ]:
+			for l in d:
+				f_out.write("%s\n" % l)
+		c += 1
+
+	if f_out is not sys.stdout:
+		f_out.close()
 
 def watch_folder():
 	global z_stack, options
@@ -366,7 +376,7 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'O:H:s:WnSITt:', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'suppress-index'])
+useroptions, infile = getopt.getopt(sys.argv[1:], 'O:H:s:WnSITt:v', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'suppress-index'])
 
 _initialize_stack()
 
@@ -389,14 +399,18 @@ for opt, arg in useroptions:
 		options["numbered-quotes"] = True
 	elif opt in ('-t'):
 		z_count["quote"] = (int(arg) - 1)
+	elif opt in ('-v'):
+		options["verbose"] = True
 
 index_filename = infile[0]
-print "Processing file " + infile[0]
+if options["verbose"]:
+	print "Processing file " + infile[0]
 
 zettel_dir = os.path.dirname(index_filename)
 
 parse_index(index_filename)
 
 if options["watch"]:
-	print "Will now watch for changes"
+	if options["verbose"]:
+		print "Will now watch for changes"
 	watch_folder()
