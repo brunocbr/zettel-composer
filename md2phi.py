@@ -11,6 +11,7 @@ import os, sys
 fields_dict = OrderedDict([
 	('origin', re.compile(r'^origin:\s+(?P<value>.*)$')),
 	('tags', re.compile(r'^tags:\s+(?P<value>.*)$')),
+	('uplink', re.compile(r'^uplink:\s+(?P<value>.*)$')),
 	('blank_line', re.compile(r'^  $')) # two spaces in a line is a blank to be disconsidered
 ])
 
@@ -51,13 +52,18 @@ def parse_chunk(chunk):
 def getHeader(zettel_id, title, fields):
 	header = [ "---", "title:\t'" + title + "'  ", "id:\t\tΦ" + zettel_id + "  "]
 	for k in fields.keys():
-			if (len(k) < 5):
-				tabs = "\t\t"
-			else:
-				tabs ="\t"
-			header = header + [ k + ":" + tabs + fields[k]]
+			if k in ["origin", "tags"]:
+				if (len(k) < 5):
+					tabs = "\t\t"
+				else:
+					tabs ="\t"
+				header = header + [ k + ":" + tabs + fields[k]]
+	header = header + ["..."]
 
-	return header + ["..."]
+	if "uplink" in fields.keys():
+		header = header + [ "", "△[[" + fields["uplink"] + "]]" ]
+
+	return header
 
 
 def readFile(filepath):
