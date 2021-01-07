@@ -16,7 +16,7 @@ options = {
 	"heading-identifier": "paragraph-",
 	"watch": False,
 	"sleep-time": 2,
-	"output": None,
+	"output": "zettel-compose.md",
 	"suppress-index": False,
     "only-link-from-index": False,
     "numbered-quotes": False,
