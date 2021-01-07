@@ -33,7 +33,6 @@ rx_dict = OrderedDict([
 	('pandoc_cite', re.compile(r'@\[\[(?P<id>\d{3,})\]\]')),
 	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),
 	('quote', re.compile(r' *>\[\[(?P<id>\d{3,})\]\]')), # insert quote immediately
-	('footnote', re.compile(r' *\%\[\[(?P<id>\d{3,})\]\]')),
 	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')), # insert note immediately
 	('link', re.compile(r'\[\[(?P<id>\d{3,})\]\]')),
 	('yaml_end_div', re.compile(r'^\.\.\.$')),
@@ -48,9 +47,9 @@ fields_dict = {
 
 def _initialize_stack():
 	global z_count, z_stack, z_map
-	z_count = { "index": 0, "body": 0, "footnote": 0, "quote": 0, "sequential": 0, "citation": 0 }
+	z_count = { "index": 0, "body": 0, "quote": 0, "sequential": 0, "citation": 0 }
 	z_stack = []
-	z_map = {} # maps zettel id's to paragraph or footnote sequence
+	z_map = {} # maps zettel id's to paragraph or sequence
 
 def _z_get_filepath(zettel_id):
 	"""
@@ -91,7 +90,6 @@ def _z_set_index(pathname):
 def _z_add_to_stack(zettel_id, z_type):
 	"""
 	Add a note to stack if not already in it
-	valid z_types are "body", "footnote"
 	"""
 	global z_count
 	global z_stack
@@ -238,10 +236,6 @@ def parse_zettel(z_item, zettel_id):
             link = match.group('id')
             _z_add_to_stack(link, "citation")            
             left_chunk = rx_dict["pandoc_cite_noauthor"].sub(_pandoc_cite_noauthor(link), left_chunk)
-
-        if key == 'footnote':
-            link = match.group('id')
-            _z_add_to_stack(link, "footnote")
 
         if key == 'add_ref':
             link = match.group('id')
