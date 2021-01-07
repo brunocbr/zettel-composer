@@ -28,15 +28,15 @@ options = {
 
 rx_dict = OrderedDict([
 	('ignore', re.compile(r'^(△|○)')),
-	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),
-	('cross_ref', re.compile(r'^\[\[(?P<id>\d{3,})\]\]')),
-	('pandoc_cite_noauthor', re.compile(r'-@\[\[(?P<id>\d{3,})\]\]')),
-	('pandoc_cite_inline', re.compile(r'@@\[\[(?P<id>\d{3,})\]\]')),
-	('pandoc_cite', re.compile(r'@\[\[(?P<id>\d{3,})\]\]')),
-	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),
-	('quote', re.compile(r' *>\[\[(?P<id>\d{3,})\]\]')), # insert quote immediately
-	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')), # insert note immediately
-	('link', re.compile(r'\[\[(?P<id>\d{3,})\]\]')),
+	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),			#   [[dddd]]:		anywhere in the text, hidden hidden cross reference
+	('cross_ref', re.compile(r'^\[\[(?P<id>\d{3,})\]\]')),				#   [[dddd]]		at the beginning of a line, hidden cross reference
+	('pandoc_cite_noauthor', re.compile(r'-@\[\[(?P<id>\d{3,})\]\]')),	# -@[[dddd]]
+	('pandoc_cite_inline', re.compile(r'@@\[\[(?P<id>\d{3,})\]\]')),	# @@[[dddd]]
+	('pandoc_cite', re.compile(r'@\[\[(?P<id>\d{3,})\]\]')),			#  @[[dddd]]
+	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),					#  -[[dddd]]		do not add note
+	('quote', re.compile(r' *>\[\[(?P<id>\d{3,})\]\]')), 				#  >[[dddd]]		insert quote immediately
+	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')), 				#  +[[dddd]]		insert note immediately
+	('link', re.compile(r'\[\[(?P<id>\d{3,})\]\]')),					#   [[dddd]]
 	('yaml_end_div', re.compile(r'^\.\.\.$')),
 	('yaml_div', re.compile(r'^\-\-\-$')),
 	('md_heading', re.compile(r'^#{1,4}[\s\w]'))
