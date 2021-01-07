@@ -8,6 +8,7 @@ import re
 from glob import glob
 from collections import OrderedDict
 import os, time, sys, getopt
+import hashlib
 
 
 options = {
@@ -68,10 +69,22 @@ def _z_get_filepath(zettel_id):
 		fn, mtime = None, None
 	return fn, mtime
 
+def _get_file_md5digest(pathname):
+	md5_hash = hashlib.md5()
+
+	with open(pathname, "rb") as a_file:
+		content = a_file.read()
+	
+	md5_hash.update(content)
+	digest = md5_hash.hexdigest()
+
+	return digest
+
 def _z_set_index(pathname):
 	global z_map, z_stack
 	mtime = os.path.getmtime(pathname)
-	z_map["index"] = { "type": "index", "ref": 0, "path": pathname, "mtime": mtime }
+	md5hash = _get_file_md5digest(pathname)
+	z_map["index"] = { "type": "index", "ref": 0, "path": pathname, "mtime": mtime, "md5hash": md5hash }
 	if len(z_stack) == 0:
 		z_stack.append("index")
 
@@ -86,7 +99,8 @@ def _z_add_to_stack(zettel_id, z_type):
 	if not zettel_id in z_map:
 		z_count[z_type] += 1
 		path, mtime = _z_get_filepath(zettel_id)
-		z_map[zettel_id] = { "type": z_type, "ref": z_count[z_type], "path": path, "mtime": mtime }
+		md5hash = _get_file_md5digest(path)
+		z_map[zettel_id] = { "type": z_type, "ref": z_count[z_type], "path": path, "mtime": mtime, "md5hash": md5hash }
 		if z_type in [ "body", "index", "quote", "citation", "sequential" ]:
 			z_stack.append(zettel_id)
 	return z_map[zettel_id]
@@ -320,6 +334,7 @@ def parse_zettel(z_item, zettel_id):
 def stream_to_marked(data):
 	from AppKit import NSPasteboard
 	
+	print("Streaming...")
 	pb = NSPasteboard.pasteboardWithName_("mkStreamingPreview")
 	pb.clearContents()
 	pb.setString_forType_(data.decode('utf-8'), 'public.utf8-plain-text')
@@ -333,7 +348,9 @@ def get_first_modified():
 	while (not result and c < len(z_stack)):
 		cur_path, cur_mtime = _z_get_filepath(z_stack[c])
 		if cur_mtime != z_map[z_stack[c]]["mtime"]:
-			result = c
+			md5hash = _get_file_md5digest(cur_path)
+			if md5hash != z_map[z_stack[c]]["md5hash"]:
+				result = c
 		z_map[z_stack[c]]["path"], z_map[z_stack[c]]["mtime"] = cur_path, cur_mtime # update modified filenames and mtimes
 		c += 1
 	return result
