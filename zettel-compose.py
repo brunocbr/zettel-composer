@@ -358,7 +358,7 @@ def parse_index(pathname):
 	output = [  ]
 	f_out = None
 
-	if options["output"] != '-':
+	if options["output"] and (options["output"] != '-'):
 		f_out = open(options["output"], "w")
 	elif not options["stream-to-marked"]:
 		f_out = sys.stdout
