@@ -9,6 +9,7 @@ from glob import glob
 from collections import OrderedDict
 import os, time, sys, getopt
 
+
 options = {
 	"no-paragraph-headings": False,
 	"heading-identifier": "paragraph-",
@@ -18,7 +19,8 @@ options = {
 	"suppress-index": False,
     "only-link-from-index": False,
     "numbered-quotes": False,
-    "verbose": False
+    "verbose": False,
+    "stream-to-marked": False
 }
 
 rx_dict = OrderedDict([
@@ -185,20 +187,6 @@ def _pandoc_cite_noauthor(zettel_id):
 		return "[-@" + citetext + "]"
 
 def parse_zettel(z_item, zettel_id):
-    """
-    Parse text at given filepath
-
-    Parameters
-    ----------
-    filepath : str
-        Filepath for file_object to be parsed
-
-    Returns
-    -------
-    data : pd.DataFrame
-        Parsed data
-
-    """
     global options, z_map
 
     filepath = z_item["path"]
@@ -329,6 +317,14 @@ def parse_zettel(z_item, zettel_id):
 
     return data
 
+def stream_to_marked(data):
+	from AppKit import NSPasteboard
+	
+	pb = NSPasteboard.pasteboardWithName_("mkStreamingPreview")
+	pb.clearContents()
+	pb.setString_forType_(data.decode('utf-8'), 'public.utf8-plain-text')
+
+
 def get_first_modified():
 	global z_stack
 	global z_map
@@ -346,10 +342,12 @@ def parse_index(pathname):
 	global z_stack, z_map, options
 	_z_set_index(pathname)
 	c = 0
+	output = [  ]
+	f_out = None
 
 	if options["output"] != '-':
 		f_out = open(options["output"], "w")
-	else:
+	elif not options["stream-to-marked"]:
 		f_out = sys.stdout
 
 	while len(z_stack) > c:
@@ -357,12 +355,18 @@ def parse_index(pathname):
 			print ("zettel id " + z_stack[c])
 		d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
 		if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index") and not z_map[z_stack[c]]["type"] in [ "quote", "citation" ]:
-			for l in d:
-				f_out.write("%s\n" % l)
+			if f_out:
+				for l in d:
+					f_out.write("%s\n" % l)
+			if options["stream-to-marked"]:
+				output = output + d
 		c += 1
 
-	if f_out is not sys.stdout:
+	if f_out and (f_out is not sys.stdout):
 		f_out.close()
+
+	if options["stream-to-marked"]:
+		stream_to_marked("\n".join(output))
 
 def watch_folder():
 	global z_stack, options
@@ -376,13 +380,15 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'O:H:s:WnSITt:v', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'suppress-index'])
+useroptions, infile = getopt.getopt(sys.argv[1:], 'O:MH:s:WnSITt:v', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index'])
 
 _initialize_stack()
 
 for opt, arg in useroptions:
 	if opt in ('-O', '--output='):
 		options["output"] = arg
+	elif opt in ('-M', '--stream-to-marked'):
+		options["stream-to-marked"] = True
 	elif opt in ('-H', 'heading-identifier='):
 		options["heading-identifier"] = arg
 	elif opt in ('-W', '--watch'):
