@@ -13,6 +13,9 @@ import hashlib
 KEY_CITEKEY = 'citekey'
 KEY_LOCATION = 'loc'
 
+STR_UNINDEXED_HEADING = '# Unindexed'
+STR_STREAMING_ID = "<!--\nzettel-compose.py\n-->\n"
+
 options = {
 	"no-paragraph-headings": False,
 	"heading-identifier": "paragraph-",
@@ -48,10 +51,11 @@ fields_dict = {
 }
 
 def _initialize_stack():
-	global z_count, z_stack, z_map
+	global z_count, z_stack, z_map, unindexed_links
 	z_count = { "index": 0, "body": 0, "quote": 0, "sequential": 0, "citation": 0 }
 	z_stack = []
 	z_map = {} # maps zettel id's to paragraph or sequence
+	unindexed_links = []
 
 def _z_get_filepath(zettel_id):
 	"""
@@ -154,6 +158,13 @@ def _out_text_quote(ref, zettel_id):
     else:
         return "{>> " + str(zettel_id) + " <<}"
 
+def _out_unindexed_notes():
+	output = [ STR_UNINDEXED_HEADING, "", ""]
+	for n in unindexed_links:
+		base = os.path.basename(_z_get_filepath(n)[0])
+		output.append(os.path.splitext(base)[0] + " " + _out_link(z_map[n]['ref'], n) + ".")
+	return output
+
 def _parse_line(line, thedict):
 	for key, rx in thedict.items():
 		match = rx.search(line)
@@ -201,7 +212,7 @@ def _pandoc_cite_noauthor(zettel_id):
 		return "[-@" + citetext + "]"
 
 def parse_zettel(z_item, zettel_id):
-    global options, z_map
+    global options, z_map, unindexed_links
 
     filepath = z_item["path"]
 
@@ -258,6 +269,8 @@ def parse_zettel(z_item, zettel_id):
             if (link in z_map) and (z_map[link]["type"] == "quote"):
                 left_chunk = rx_dict["link"].sub(_out_quoteref(z_map[link]["ref"], link), left_chunk) 
        	    elif (z_item["type"] == "index") or (options["only-link-from-index"] is not True):
+	            if (link not in z_map) and (z_item["type"] not in [ "index", "sequential" ]):
+	            	unindexed_links.append(link)
 	            _z_add_to_stack(link, "body")
 	            left_chunk = rx_dict["link"].sub(_out_link(z_map[link]["ref"], link), left_chunk)
     	    else:
@@ -354,34 +367,43 @@ def get_first_modified():
 	return result
 
 def parse_index(pathname):
-	global z_stack, z_map, options
-	_z_set_index(pathname)
+	global z_stack, z_map, options, unindexed_links
+
 	c = 0
-	output = [  ]
-	f_out = None
+	parse_index.output = [ STR_STREAMING_ID ]
+	parse_index.f_out = None
+
+	def write_to_output(contents):
+		if parse_index.f_out:
+			for l in contents:
+				parse_index.f_out.write("%s\n" % l)	
+		if options["stream-to-marked"]:
+			parse_index.output = parse_index.output + contents
+
+	_z_set_index(pathname)
 
 	if options["output"] and (options["output"] != '-'):
-		f_out = open(options["output"], "w")
+		parse_index.f_out = open(options["output"], "w")
 	elif not options["stream-to-marked"]:
-		f_out = sys.stdout
+		parse_index.f_out = sys.stdout
 
 	while len(z_stack) > c:
 		if options["verbose"]:
 			print ("zettel id " + z_stack[c])
 		d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
 		if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index") and not z_map[z_stack[c]]["type"] in [ "quote", "citation" ]:
-			if f_out:
-				for l in d:
-					f_out.write("%s\n" % l)
-			if options["stream-to-marked"]:
-				output = output + d
+			write_to_output(d)
 		c += 1
 
-	if f_out and (f_out is not sys.stdout):
-		f_out.close()
+	if unindexed_links and options["stream-to-marked"]:
+		d = _out_unindexed_notes()
+		write_to_output(d)
+
+	if parse_index.f_out and (parse_index.f_out is not sys.stdout):
+		parse_index.f_out.close()
 
 	if options["stream-to-marked"]:
-		stream_to_marked("\n".join(output))
+		stream_to_marked("\n".join(parse_index.output))
 
 def watch_folder():
 	global z_stack, options
