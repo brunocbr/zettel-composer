@@ -391,7 +391,7 @@ def parse_index(pathname):
 		if options["verbose"]:
 			print ("zettel id " + z_stack[c])
 		d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
-		if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index") and not z_map[z_stack[c]]["type"] in [ "quote", "citation" ]:
+		if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index") and (z_map[z_stack[c]]["type"] not in [ "quote", "citation", "sequential" ]):
 			write_to_output(d)
 		c += 1
 
