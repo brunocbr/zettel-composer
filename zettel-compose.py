@@ -334,7 +334,9 @@ def parse_zettel(z_item, zettel_id):
 def stream_to_marked(data):
 	from AppKit import NSPasteboard
 	
-	print("Streaming...")
+	if options["verbose"]:
+		print("Streaming...")
+
 	pb = NSPasteboard.pasteboardWithName_("mkStreamingPreview")
 	pb.clearContents()
 	pb.setString_forType_(data.decode('utf-8'), 'public.utf8-plain-text')
@@ -391,7 +393,8 @@ def watch_folder():
 	while True:
 		modified = get_first_modified()
 		if modified is not None:
-			print "note " + str(modified) + " id " + z_stack[modified] + " was modified"
+			if options["verbose"]:
+				print("note " + str(modified) + " id " + z_stack[modified] + " was modified")
 			time.sleep(1)
 			_initialize_stack()
 			parse_index(index_filename)
