@@ -10,6 +10,8 @@ from collections import OrderedDict
 import os, time, sys, getopt
 import hashlib
 
+KEY_CITEKEY = 'citekey'
+KEY_LOCATION = 'loc'
 
 options = {
 	"no-paragraph-headings": False,
@@ -41,8 +43,8 @@ rx_dict = OrderedDict([
 ])
 
 fields_dict = {
-	"citekey": re.compile(r'^citekey:[ \t]*(?P<id>[A-Za-z\d:]+) *$'),
-	"loc": re.compile(r'^loc:[ \t]*(?P<id>[\d-]+) *$')
+	"citekey": re.compile(r'^' + KEY_CITEKEY + r':[ \t]*(?P<id>[A-Za-z\d:]+) *$'),
+	"loc": re.compile(r'^' + KEY_LOCATION + r':[ \t]*(?P<id>[\d-]+) *$')
 }
 
 def _initialize_stack():
