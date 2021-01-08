@@ -173,9 +173,9 @@ def _out_parallel_texts(left, right):
 		else:
 			output.append(_out_text_quote(z_map[right]["ref"], right))
 		if ('r' in options['parallel-texts-selection']):
-			output.append('')
+			output.append('> ')
 			if ('l' in options['parallel-texts-selection']):
-				output.append("> " + _out_commented_id(right) + "  ")
+				output.append("> " + _out_commented_id(right) + '  ')
 			output = output + right_data
 
 	return output
