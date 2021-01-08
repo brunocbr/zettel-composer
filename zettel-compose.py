@@ -32,7 +32,7 @@ options = {
 
 rx_dict = OrderedDict([
 	('ignore', re.compile(r'^(△|○)')),
-	('parallel_texts', re.compile(r' *>\[\[(?P<id_left>\d{3,})\]\]::\[\[(?P<id_right>\d{3,})\]\]')),
+	('parallel_texts', re.compile(r' *>\[\[(?P<id_left>\d{3,})\]\]::\[\[(?P<id_right>\d{3,})\]\]')), # >[[dddd]]::[[dddd]]
 	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),			#   [[dddd]]:		anywhere in the text, hidden hidden cross reference
 	('cross_ref', re.compile(r'^\[\[(?P<id>\d{3,})\]\]')),				#   [[dddd]]		at the beginning of a line, hidden cross reference
 	('pandoc_cite_noauthor', re.compile(r'-@\[\[(?P<id>\d{3,})\]\]')),	# -@[[dddd]]
@@ -107,7 +107,7 @@ def _z_add_to_stack(zettel_id, z_type):
 		path, mtime = _z_get_filepath(zettel_id)
 		md5hash = _get_file_md5digest(path)
 		z_map[zettel_id] = { "type": z_type, "ref": z_count[z_type], "path": path, "mtime": mtime, "md5hash": md5hash }
-		if z_type in [ "body", "index", "quote", "citation", "sequential" ]:
+		if z_type in [ 'body', 'index', 'quote', 'citation', 'sequential', 'left_text', 'right_text' ]:
 			z_stack.append(zettel_id)
 	return z_map[zettel_id]
 
