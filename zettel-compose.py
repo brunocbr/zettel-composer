@@ -390,7 +390,7 @@ def parse_index(pathname):
 				write_to_output(d)
 		c += 1
 
-	if unindexed_links and options["stream-to-marked"]:
+	if unindexed_links:
 		d = _out_unindexed_notes()
 		write_to_output(d)
 
