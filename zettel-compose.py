@@ -31,15 +31,14 @@ options = {
 
 rx_dict = OrderedDict([
 	('ignore', re.compile(r'^(△|○)')),
-	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),			#   [[dddd]]:	anywhere in the text, hidden hidden cross reference
-	('cross_ref', re.compile(r'^\[\[(?P<id>\d{3,})\]\]')),				#   [[dddd]]	at the beginning of a line, hidden cross reference
+	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),			#   [[dddd]]:		anywhere in the text, hidden hidden cross reference
+	('cross_ref', re.compile(r'^\[\[(?P<id>\d{3,})\]\]')),				#   [[dddd]]		at the beginning of a line, hidden cross reference
 	('pandoc_cite_noauthor', re.compile(r'-@\[\[(?P<id>\d{3,})\]\]')),	# -@[[dddd]]
 	('pandoc_cite_inline', re.compile(r'@@\[\[(?P<id>\d{3,})\]\]')),	# @@[[dddd]]
 	('pandoc_cite', re.compile(r'@\[\[(?P<id>\d{3,})\]\]')),			#  @[[dddd]]
-	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),					#  -[[dddd]]	do not add note
-	('numbered_quote', re.compile(r' *>>\[\[(?P<id>\d{3,})\]\]')), 		# >>[[dddd]]	insert numbered quote immediately; avoid: use -T with +[[dddd]] for non-numbered quotes
-	('quote', re.compile(r' *>\[\[(?P<id>\d{3,})\]\]')), 				#  >[[dddd]]	insert quote immediately
-	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')), 				#  +[[dddd]]	insert note immediately
+	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),					#  -[[dddd]]		do not add note
+	('quote', re.compile(r' *>\[\[(?P<id>\d{3,})\]\]')), 				#  >[[dddd]]		insert quote immediately
+	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')), 				#  +[[dddd]]		insert note immediately
 	('link', re.compile(r'\[\[(?P<id>\d{3,})\]\]')),					#   [[dddd]]
 	('yaml_end_div', re.compile(r'^\.\.\.$')),
 	('yaml_div', re.compile(r'^\-\-\-$')),
@@ -53,7 +52,7 @@ fields_dict = {
 
 def _initialize_stack():
 	global z_count, z_stack, z_map, unindexed_links
-	z_count = { "index": 0, "body": 0, "quote": 0, "numbered_quote": 0, "sequential": 0, "citation": 0 }
+	z_count = { "index": 0, "body": 0, "quote": 0, "sequential": 0, "citation": 0 }
 	z_stack = []
 	z_map = {} # maps zettel id's to paragraph or sequence
 	unindexed_links = []
@@ -149,12 +148,12 @@ def _out_commented_id(zettel_id, pre = ""):
 	"""
 	return "{>> " + pre + str(zettel_id) + " <<}"
 
-def _out_text_quote(ref, zettel_id, force_numbered = False):
+def _out_text_quote(ref, zettel_id):
     """
     Formatted output for quote preamble
     """
     global options
-    if options["numbered-quotes"] or force_numbered:
+    if options["numbered-quotes"]:
         return "> **T" + str(ref) + "**{>> = " + str(zettel_id) + " <<}:  "
     else:
         return "{>> " + str(zettel_id) + " <<}"
@@ -231,11 +230,10 @@ def parse_zettel(z_item, zettel_id):
 
         left_chunk = chunk[:end]
 
-        if key in [ 'quote', 'numbered_quote' ]:
+        if key == 'quote':
         	link = match.group('id')
-        	_z_add_to_stack(link, key)
         	insert_quotes.append(link)
-        	left_chunk = rx_dict[key].sub("", left_chunk)
+        	left_chunk = rx_dict["quote"].sub("", left_chunk)
 
         elif key == 'pandoc_cite':
             link = match.group('id')
@@ -303,7 +301,7 @@ def parse_zettel(z_item, zettel_id):
         # our paragraph heading after, not before it
 
         if (key == "md_heading") and not got_content:
-        	if (z_item["type"] not in ['quote', 'numbered_quote']): # headings in citation notes are for handouts only
+        	if (z_item["type"] != "quote"): # headings in citation notes are for handouts only
 	        	data.append(line)
 	        	data.append('')
 	        got_content = False
@@ -314,8 +312,6 @@ def parse_zettel(z_item, zettel_id):
         		data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
         	elif (z_item["type"] == "quote"):
         		data.append(_out_text_quote(z_item["ref"], zettel_id))
-        	elif (z_item["type"] == "numbered_quote"):
-        		data.append(_out_text_quote(z_item["ref"], zettel_id, force_numbered = True))
         	elif (z_item["type"] == "sequential"):
         		data.append(_out_commented_id(zettel_id))	        	
         	got_content = True
@@ -331,6 +327,7 @@ def parse_zettel(z_item, zettel_id):
 
        	if insert_quotes is not []:
        		for i in insert_quotes:
+       			_z_add_to_stack(i, "quote")					# add to stack...
        			insert_data = parse_zettel(z_map[i], i)
        			data = data + ['\n'] + insert_data 						# ...but insert immediately after line
 
