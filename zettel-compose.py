@@ -25,11 +25,14 @@ options = {
 	"suppress-index": False,
     "only-link-from-index": False,
     "verbose": False,
-    "stream-to-marked": False
+    "stream-to-marked": False,
+    'parallel-texts-processor': None,
+    'parallel-texts-selection': 'lr'
 }
 
 rx_dict = OrderedDict([
 	('ignore', re.compile(r'^(△|○)')),
+	('parallel_texts', re.compile(r' *>\[\[(?P<id_left>\d{3,})\]\]::\[\[(?P<id_right>\d{3,})\]\]')),
 	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),			#   [[dddd]]:		anywhere in the text, hidden hidden cross reference
 	('cross_ref', re.compile(r'^\[\[(?P<id>\d{3,})\]\]')),				#   [[dddd]]		at the beginning of a line, hidden cross reference
 	('pandoc_cite_noauthor', re.compile(r'-@\[\[(?P<id>\d{3,})\]\]')),	# -@[[dddd]]
@@ -51,7 +54,7 @@ fields_dict = {
 
 def _initialize_stack():
 	global z_count, z_stack, z_map, unindexed_links
-	z_count = { "index": 0, "body": 0, "quote": 0, "sequential": 0, "citation": 0 }
+	z_count = { "index": 0, "body": 0, "quote": 0, "sequential": 0, "citation": 0, "left_text": 0, "right_text": 0 }
 	z_stack = []
 	z_map = {} # maps zettel id's to paragraph or sequence
 	unindexed_links = []
@@ -159,6 +162,23 @@ def _out_unindexed_notes():
 		output.append(os.path.splitext(base)[0] + " " + _out_link(z_map[n]['ref'], n) + ".")
 	return output
 
+def _out_parallel_texts(left, right):
+	left_data = parse_zettel(z_map[left], left)
+	right_data = parse_zettel(z_map[right], right)
+	output = []
+	if not options['parallel-texts-processor']:
+		if ('l' in options['parallel-texts-selection']):
+			output.append(_out_text_quote(z_map[left]["ref"], left))
+			output = output + left_data
+		else:
+			output.append(_out_text_quote(z_map[right]["ref"], right))
+		if ('r' in options['parallel-texts-selection']):
+			if ('l' in options['parallel-texts-selection']):
+				output.append(_out_commented_id(right))
+			output = output + right_data
+
+	return output
+
 def _parse_line(line, thedict):
 	for key, rx in thedict.items():
 		match = rx.search(line)
@@ -229,6 +249,11 @@ def parse_zettel(z_item, zettel_id):
         	insert_quotes.append(link)
         	left_chunk = rx_dict["quote"].sub("", left_chunk)
 
+        elif key == 'parallel_texts':
+        	left_link, right_link = match.group('id_left'), match.group('id_right')
+        	insert_parallel_texts.append((left_link, right_link))
+        	left_chunk = rx_dict['parallel_texts'].sub("", left_chunk)
+
         elif key == 'pandoc_cite':
             link = match.group('id')
             _z_add_to_stack(link, "citation")
@@ -276,6 +301,7 @@ def parse_zettel(z_item, zettel_id):
 
     for line in lines:
     	insert_quotes = []
+    	insert_parallel_texts = []
     	insert_sequence = []
 		# at each line check for a match with a regex
         key, match, end = _parse_line(line, rx_dict)
@@ -306,7 +332,7 @@ def parse_zettel(z_item, zettel_id):
         		data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
         	elif (z_item["type"] == "quote"):
         		data.append(_out_text_quote(z_item["ref"], zettel_id))
-        	elif (z_item["type"] == "sequential"):
+        	elif (z_item["type"] in [ 'sequential' ]):
         		data.append(_out_commented_id(zettel_id))	        	
         	got_content = True
 
@@ -324,6 +350,13 @@ def parse_zettel(z_item, zettel_id):
        			_z_add_to_stack(i, "quote")					# add to stack...
        			insert_data = parse_zettel(z_map[i], i)
        			data = data + ['\n'] + insert_data 						# ...but insert immediately after line
+
+       	if insert_parallel_texts is not []:
+       		for l, r in insert_parallel_texts:
+       			_z_add_to_stack(l, 'left_text')
+       			_z_add_to_stack(r, 'right_text')
+       			insert_data = _out_parallel_texts(l, r)
+       			data = data + ['\n'] + insert_data
 
     return data
 
@@ -377,7 +410,7 @@ def parse_index(pathname):
 	while len(z_stack) > c:
 		if options["verbose"]:
 			print ("zettel id " + z_stack[c])
-		if z_map[z_stack[c]]["type"] not in [ "quote", "citation" ]:
+		if z_map[z_stack[c]]['type'] not in [ 'quote', 'citation', 'left_text', 'right_text' ]:
 			d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
 			if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index") and (z_map[z_stack[c]]["type"] not in [ "sequential" ]):
 				write_to_output(d)
@@ -406,7 +439,7 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'O:MH:s:WnSIt:v', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index'])
+useroptions, infile = getopt.getopt(sys.argv[1:], 'O:MH:s:WnSIt:G:v', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index'])
 
 _initialize_stack()
 
@@ -429,6 +462,10 @@ for opt, arg in useroptions:
 		options["only-link-from-index"] = True
 	elif opt in ('-t'):
 		z_count["quote"] = (int(arg) - 1)
+	elif opt in ('-G'):
+		if ('l' not in arg) and ('r' not in arg):
+			raise ValueError("-G should take either 'l' or 'r' as argument")
+		options['parallel-texts-selection'] = arg
 	elif opt in ('-v'):
 		options["verbose"] = True
 
