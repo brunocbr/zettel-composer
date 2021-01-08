@@ -125,7 +125,6 @@ def _out_quoteref(ref, id):
     """
     Formatted output for text reference
 	"""
-    global options
     return "T" + str(ref)
 
 def _out_paragraph_heading(ref, zettel_id):
