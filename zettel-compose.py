@@ -268,7 +268,7 @@ def parse_zettel(z_item, zettel_id):
             link = match.group('id')
             if (link in z_map) and (z_map[link]["type"] == "quote"):
                 left_chunk = rx_dict["link"].sub(_out_quoteref(z_map[link]["ref"], link), left_chunk) 
-       	    elif (z_item["type"] == "index") or (options["only-link-from-index"] is not True):
+       	    elif (z_item["type"] not in [ "citation" ]) and ((z_item["type"] == "index") or (options["only-link-from-index"] is not True)):
 	            if (link not in z_map) and (z_item["type"] not in [ "index", "sequential" ]):
 	            	unindexed_links.append(link)
 	            _z_add_to_stack(link, "body")
@@ -384,9 +384,10 @@ def parse_index(pathname):
 	while len(z_stack) > c:
 		if options["verbose"]:
 			print ("zettel id " + z_stack[c])
-		d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
-		if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index") and (z_map[z_stack[c]]["type"] not in [ "quote", "citation", "sequential" ]):
-			write_to_output(d)
+		if z_map[z_stack[c]]["type"] not in [ "quote", "citation" ]:
+			d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
+			if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index") and (z_map[z_stack[c]]["type"] not in [ "sequential" ]):
+				write_to_output(d)
 		c += 1
 
 	if unindexed_links and options["stream-to-marked"]:
