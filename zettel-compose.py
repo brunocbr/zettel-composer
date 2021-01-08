@@ -267,7 +267,7 @@ def parse_zettel(z_item, zettel_id):
 
         elif key == 'link':
             link = match.group('id')
-            if (link in z_map) and (z_map[link]["type"] == "quote"):
+            if (link in z_map) and (z_map[link]["type"] in [ 'quote', 'numbered_quote' ]):
                 left_chunk = rx_dict["link"].sub(_out_quoteref(z_map[link]["ref"], link), left_chunk) 
        	    elif (z_item["type"] not in [ "citation" ]) and ((z_item["type"] == "index") or (options["only-link-from-index"] is not True)):
 	            if (link not in z_map) and (z_item["type"] not in [ "index", "sequential" ]):
