@@ -24,7 +24,6 @@ options = {
 	"output": None,
 	"suppress-index": False,
     "only-link-from-index": False,
-    "numbered-quotes": False,
     "verbose": False,
     "stream-to-marked": False
 }
@@ -152,11 +151,7 @@ def _out_text_quote(ref, zettel_id):
     """
     Formatted output for quote preamble
     """
-    global options
-    if options["numbered-quotes"]:
-        return "> **T" + str(ref) + "**{>> = " + str(zettel_id) + " <<}:  "
-    else:
-        return "{>> " + str(zettel_id) + " <<}"
+    return "> **T" + str(ref) + "**{>> = " + str(zettel_id) + " <<}:  "
 
 def _out_unindexed_notes():
 	output = [ STR_UNINDEXED_HEADING, "", ""]
@@ -412,7 +407,7 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'O:MH:s:WnSITt:v', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index'])
+useroptions, infile = getopt.getopt(sys.argv[1:], 'O:MH:s:WnSIt:v', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index'])
 
 _initialize_stack()
 
@@ -433,8 +428,6 @@ for opt, arg in useroptions:
 		options["suppress-index"] = True
 	elif opt in ('-I'):
 		options["only-link-from-index"] = True
-	elif opt in ('-T'):
-		options["numbered-quotes"] = True
 	elif opt in ('-t'):
 		z_count["quote"] = (int(arg) - 1)
 	elif opt in ('-v'):
