@@ -235,36 +235,35 @@ def parse_zettel(z_item, zettel_id):
         	insert_quotes.append(link)
         	left_chunk = rx_dict["quote"].sub("", left_chunk)
 
-        if key == 'pandoc_cite':
+        elif key == 'pandoc_cite':
             link = match.group('id')
             _z_add_to_stack(link, "citation")
             left_chunk = rx_dict["pandoc_cite"].sub(_pandoc_cite(link), left_chunk)
 
-        if key == 'pandoc_cite_inline':
+        elif key == 'pandoc_cite_inline':
             link = match.group('id')
             _z_add_to_stack(link, "citation")
             left_chunk = rx_dict["pandoc_cite_inline"].sub(_pandoc_cite(link, parenthetical = False), left_chunk)
 
-        if key == 'pandoc_cite_noauthor':
+        elif key == 'pandoc_cite_noauthor':
             link = match.group('id')
             _z_add_to_stack(link, "citation")            
             left_chunk = rx_dict["pandoc_cite_noauthor"].sub(_pandoc_cite_noauthor(link), left_chunk)
 
-        if key == 'add_ref':
+        elif key == 'add_ref':
             link = match.group('id')
             insert_sequence.append(link)
             left_chunk = rx_dict["add_ref"].sub("", left_chunk)
 
-
-        if key in [ 'cross_ref', 'cross_ref_alt' ]:
+        elif key in [ 'cross_ref', 'cross_ref_alt' ]:
             link = match.group('id')
             left_chunk = rx_dict[key].sub(_out_commented_id(link), left_chunk)
 
-        if key == 'no_ref':
+        elif key == 'no_ref':
             link = match.group('id')
             left_chunk = rx_dict["no_ref"].sub(_out_commented_id(link), left_chunk)
 
-        if key == 'link':
+        elif key == 'link':
             link = match.group('id')
             if (link in z_map) and (z_map[link]["type"] == "quote"):
                 left_chunk = rx_dict["link"].sub(_out_quoteref(z_map[link]["ref"], link), left_chunk) 
