@@ -8,6 +8,11 @@ import re
 from collections import OrderedDict
 import os, sys, urllib.parse
 
+# import subprocess, xcall
+
+XCALL_PATH = (os.path.dirname(os.path.abspath(__file__)) +
+              '/lib/xcall.app/Contents/MacOS/xcall')
+
 fields_dict = OrderedDict([
 	('tags', re.compile(r'^tags:\s+(?P<value>.*)\s*$')),
 	('title', re.compile(r'^title:\s+\'+(?P<value>.*)\'\s*$')),
@@ -60,7 +65,7 @@ def getHeader(fields):
 		uplink = ""
 
 
-	header = [ "origin: " + origin, "tags: " + tags,  "uplink: " + uplink ]
+	header = [ "uplink: " + uplink, "tags: " + tags, "origin: " + origin ]
 	return header
 
 def readFile(filepath):
@@ -69,6 +74,7 @@ def readFile(filepath):
 
 	fields = {}
 	data = []
+	got_content = False
 	
 	for line in lines:
 		key, match, end = parse_line(line, fields_dict)
@@ -77,16 +83,44 @@ def readFile(filepath):
 				value = match.group('value')
 				fields[key] = value
 			continue
-		line = parse_chunk(line)
-		data.append(line)
+		if (line != ''):
+			line = parse_chunk(line)
+			got_content = True
+
+		if got_content:
+			data.append(line)
 
 	return data, fields
+
+
+def xcall_ulysses(url):
+	args = [XCALL_PATH, '-url', '"%s"' % url]
+#	args = args + ['-activateApp', 'YES']
+
+	p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	stdout, stderr = p.communicate()
+
+	if stdout and (stderr == ''):
+		response = urllib.unquote(stdout).decode('utf8')
+		return response
 
 
 infile = sys.argv[1]
 d, f = readFile(infile)
 h = getHeader(f)
-titleline = [f["id"] + " " + f["title"], ""]
-out = "\n".join(titleline + d + [""] + h)
+titleline = [f["id"] + " " + f["title"]]
+out = "\n".join(titleline + [""] + d + [""] + h)
 
 os.system("open ulysses://x-callback-url/new-sheet?text=" + urllib.parse.quote(out))
+
+# status = os.system(XCALL_PATH + " -url \"ulysses://x-callback-url/new-sheet?text=" + urllib.parse.quote(out) + "\"")
+
+# status = xcall_ulysses("ulysses://x-callback-url/new-sheet?text=" + urllib.parse.quote(out)) 
+# print(status)
+
+# ULYSSES_XCALL = xcall.XCallClient('ulysses')
+# ULYSSES_XCALL.xcall("new-sheet", {"text": out}, activate_app=True)
+
+
+
+
