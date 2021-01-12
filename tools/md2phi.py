@@ -16,8 +16,8 @@ fields_dict = OrderedDict([
 ])
 
 rx_dict = OrderedDict([
-	('cross_ref', re.compile(r'\*\*(?P<id>\d{3,})\*\*')), 	# any three-or-more-digit bold text is a wikilink
-	('footnote', re.compile(r'\[\^(?P<fn_id>\d+)\]')) 		# markdown footnotes
+	('footnote', re.compile(r'\[\^(?P<fn_id>[a-zA-Z0-9_-]+)]')),
+	('cross_ref', re.compile(r'\*\*(?P<id>\d{3,})\*\*')) 	# any three-or-more-digit bold text is a wikilink
 ])
 
 title_rx = re.compile(r'(?P<id>\d{3,})\s+(?P<title>.+)$')
