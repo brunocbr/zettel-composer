@@ -12,8 +12,9 @@ MINDNODE_PHI_PATH = '/phi'
 
 rx_dict = OrderedDict([
 #	('task', re.compile(r'\[(?P<status>.)\]\s+(?P<task>.*)')),
-	('link', re.compile(r'\[(?P<anchor>.+)\]\(x-phi://(?P<link>\d{3,})\)'))
-#	('index_entry', re.compile(r'^- (?P<entry>.*)$')),
+	('link', re.compile(r'\[(?P<anchor>.+)\]\(x-phi://(?P<link>\d{3,})\)')),
+	('list_entry', re.compile(r'^- (?P<entry>.*)$')),
+	('atx_header', re.compile(r'^#+'))
 ])
 
 title_rx = re.compile(r'(?P<id>\d{3,})\s+(?P<title>.+)$')
@@ -31,9 +32,9 @@ def parse_chunk(chunk):
 				link = match.group('link')
 				left_chunk = rx_dict['link'].sub(value + " [[" + link + "]]", left_chunk)
 
-			if (key == 'index_entry'):
-				value = match.group('entry')
-				left_chunk = rx_dict['index_entry'].sub(value + ".", left_chunk)
+#			if (key == 'list_entry'):
+#				value = match.group('entry')
+#				left_chunk = rx_dict['list_entry'].sub(value + ".", left_chunk)
 
 			if (key == 'task'):
 				value = match.group('status')
@@ -49,6 +50,7 @@ def getHeader(zettel_id, title):
 		'origin:\t' + MINDNODE_URI + MINDNODE_PHI_PATH + '/' + quote(zettel_id + ' ' + title) ]
 
 	header.append("...")
+	header.append("")
 
 	return header
 
@@ -56,12 +58,26 @@ def readFile(infile):
 	global rx_dict
 
 	data = []
+	got_list_item = False
+	atx_header = False
+	got_blank = False
+
 	with open(infile, 'r') as file_obj:
 		lines = file_obj.read().splitlines()
 
 	for line in lines:
 		line = parse_chunk(line)
-		data.append(line)
+		atx_header = rx_dict['atx_header'].search(line)
+
+		if atx_header and got_blank:
+			data.append('')
+		if (line != '') or not got_list_item:
+			data.append(line)
+		if (line != ''):
+			got_list_item = rx_dict['list_entry'].search(line)
+			got_blank = False
+		else:
+			got_blank = True
 
 	h = getHeader(phi_id, title)
 	return h + data
