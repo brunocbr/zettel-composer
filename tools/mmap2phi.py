@@ -13,7 +13,7 @@ MINDNODE_PHI_PATH = '/phi'
 rx_dict = OrderedDict([
 #	('task', re.compile(r'\[(?P<status>.)\]\s+(?P<task>.*)')),
 	('link', re.compile(r'\[(?P<anchor>.+)\]\(x-phi://(?P<link>\d{3,})\)')),
-	('list_entry', re.compile(r'^- (?P<entry>.*)$')),
+	('list_entry', re.compile(r'^\s*- (?P<entry>.*)$')),
 	('atx_header', re.compile(r'^#+'))
 ])
 
