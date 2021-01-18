@@ -7,7 +7,7 @@ from urllib.parse import quote
 from collections import OrderedDict
 
 MINDNODE_URI='mindnode:/'
-MINDNODE_PHI_PATH = '/phi'
+MINDNODE_PHI_PATH = 'phi'
 
 
 rx_dict = OrderedDict([
@@ -47,7 +47,7 @@ def parse_chunk(chunk):
 
 def getHeader(zettel_id, title):
 	header = [ "---", "title:\t'" + title + "'  ", "id:\t\tΦ" + zettel_id + "  ",
-		'origin:\t' + MINDNODE_URI + MINDNODE_PHI_PATH + '/' + quote(zettel_id + ' ' + title) ]
+		'origin:\t' + MINDNODE_URI + '/open?name=' + quote(zettel_id + ' ' + title) + '.mindnode&path=' + MINDNODE_PHI_PATH ]
 
 	header.append("...")
 	header.append("")
