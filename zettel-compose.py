@@ -16,6 +16,8 @@ KEY_LOCATION = 'loc'
 STR_ZETTEL_URL = 'thearchive://match/'
 STR_UNINDEXED_HEADING = '# Unindexed'
 STR_STREAMING_ID = "<!--\nzettel-compose.py\n-->\n"
+STR_SIGN_INSERT = '▾ '	# = '▾ '
+STR_SIGN_COMMENT = '▸ ' # =  '❧ '  = '▹ '
 
 options = {
 	"no-paragraph-headings": False,
@@ -143,21 +145,21 @@ def _out_paragraph_heading(ref, zettel_id):
 		return "{>> = " + _out_linked_zettel(zettel_id) + " = <<}"
 	else:
 		if options["heading-identifier"]:
-			return "#### " + str(ref) + " {>> = " + _out_linked_zettel(zettel_id) + " <<}" + " {#" + options["heading-identifier"] + str(ref) + "}"
+			return "#### " + str(ref) + " {>> " + STR_SIGN_INSERT + _out_linked_zettel(zettel_id) + " <<}" + " {#" + options["heading-identifier"] + str(ref) + "}"
 		else:
 			return "#### " + str(ref)
 
-def _out_commented_id(zettel_id, pre = ""):
+def _out_commented_id(zettel_id, pre = "", post=""):
 	"""
 	Formatted output for -[[id]]
 	"""
-	return "{>> " + pre + _out_linked_zettel(zettel_id) + " <<}"
+	return "{>> " + pre + _out_linked_zettel(zettel_id) + post + " <<}"
 
 def _out_text_quote(ref, zettel_id):
     """
     Formatted output for quote preamble
     """
-    return "> **T" + str(ref) + "**{>> = " + _out_linked_zettel(zettel_id) + " <<}:  "
+    return "> **T" + str(ref) + "**{>> " + STR_SIGN_INSERT + _out_linked_zettel(zettel_id) + " <<}:  "
 
 def _out_unindexed_notes():
 	output = [ STR_UNINDEXED_HEADING, "", ""]
@@ -179,7 +181,7 @@ def _out_parallel_texts(left, right):
 		if ('r' in options['parallel-texts-selection']):
 			output.append('> ')
 			if ('l' in options['parallel-texts-selection']):
-				output.append("> " + _out_commented_id(right) + '  ')
+				output.append("> " + _out_commented_id(right, pre=STR_SIGN_INSERT) + '  ')
 			output = output + right_data
 
 	return output
@@ -281,7 +283,7 @@ def parse_zettel(z_item, zettel_id):
 
         elif key in [ 'cross_ref', 'cross_ref_alt' ]:
             link = match.group('id')
-            left_chunk = rx_dict[key].sub(_out_commented_id(link), left_chunk)
+            left_chunk = rx_dict[key].sub(_out_commented_id(link, pre=STR_SIGN_COMMENT), left_chunk)
 
         elif key == 'no_ref':
             link = match.group('id')
@@ -338,7 +340,7 @@ def parse_zettel(z_item, zettel_id):
         	elif (z_item["type"] == "quote"):
         		data.append(_out_text_quote(z_item["ref"], zettel_id))
         	elif (z_item["type"] in [ 'sequential' ]):
-        		data.append(_out_commented_id(zettel_id))	        	
+        		data.append(_out_commented_id(zettel_id, pre=STR_SIGN_INSERT))	        	
         	got_content = True
 
        	if got_content:
