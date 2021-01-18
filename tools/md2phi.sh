@@ -17,4 +17,4 @@ EOF
 	mv -f "${PHI_PATH}/${PHI_ID} "*".markdown" "${TRASH_PATH}"
 fi
 
-/Users/brunoc/GitHub/zettel-composer/md2phi.py "${PHI_PATH}" "${1}"
+/Users/brunoc/GitHub/zettel-composer/tools/md2phi.py "${PHI_PATH}" "${1}"
