@@ -159,7 +159,7 @@ def _out_text_quote(ref, zettel_id):
     """
     Formatted output for quote preamble
     """
-    return "> **T" + str(ref) + "**{>> " + STR_SIGN_INSERT + _out_linked_zettel(zettel_id) + " <<}:  "
+    return '> ' + "{>> " + STR_SIGN_INSERT + _out_linked_zettel(zettel_id) + " <<} " + "**T" + str(ref) + ":**  "
 
 def _out_unindexed_notes():
 	output = [ STR_UNINDEXED_HEADING, "", ""]
