@@ -13,6 +13,7 @@ import hashlib
 KEY_CITEKEY = 'citekey'
 KEY_LOCATION = 'loc'
 
+STR_ZETTEL_URL = 'thearchive://match/'
 STR_UNINDEXED_HEADING = '# Unindexed'
 STR_STREAMING_ID = "<!--\nzettel-compose.py\n-->\n"
 
@@ -124,6 +125,9 @@ def _out_link(ref, id):
 		else:
 			return " (§" + str(ref) + ")"
 
+def _out_linked_zettel(id):
+	return '[' + str(id) + '](' + STR_ZETTEL_URL + str(id) + ')'
+
 def _out_quoteref(ref, id):
     """
     Formatted output for text reference
@@ -136,10 +140,10 @@ def _out_paragraph_heading(ref, zettel_id):
 	"""
 	global options
 	if options["no-paragraph-headings"]:
-		return "{>> = " + str(zettel_id) + " = <<}"
+		return "{>> = " + _out_linked_zettel(zettel_id) + " = <<}"
 	else:
 		if options["heading-identifier"]:
-			return "#### " + str(ref) + " {>> = " + str(zettel_id) + " <<}" + " {#" + options["heading-identifier"] + str(ref) + "}"
+			return "#### " + str(ref) + " {>> = " + _out_linked_zettel(zettel_id) + " <<}" + " {#" + options["heading-identifier"] + str(ref) + "}"
 		else:
 			return "#### " + str(ref)
 
@@ -147,13 +151,13 @@ def _out_commented_id(zettel_id, pre = ""):
 	"""
 	Formatted output for -[[id]]
 	"""
-	return "{>> " + pre + str(zettel_id) + " <<}"
+	return "{>> " + pre + _out_linked_zettel(zettel_id) + " <<}"
 
 def _out_text_quote(ref, zettel_id):
     """
     Formatted output for quote preamble
     """
-    return "> **T" + str(ref) + "**{>> = " + str(zettel_id) + " <<}:  "
+    return "> **T" + str(ref) + "**{>> = " + _out_linked_zettel(zettel_id) + " <<}:  "
 
 def _out_unindexed_notes():
 	output = [ STR_UNINDEXED_HEADING, "", ""]
