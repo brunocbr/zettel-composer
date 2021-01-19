@@ -20,6 +20,7 @@ STR_SIGN_INSERT = '▾ '	# = '▾ '
 STR_SIGN_COMMENT = '▸ ' # =  '❧ '  = '▹ '
 
 options = {
+	'no-commented-references': False,
 	"no-paragraph-headings": False,
 	"heading-identifier": "paragraph-",
 	"watch": False,
@@ -142,24 +143,27 @@ def _out_paragraph_heading(ref, zettel_id):
 	"""
 	global options
 	if options["no-paragraph-headings"]:
-		return "{>> = " + _out_linked_zettel(zettel_id) + " = <<}"
+		return  _out_commented_id(zettel_id)
 	else:
 		if options["heading-identifier"]:
-			return "#### " + str(ref) + " {>> " + STR_SIGN_INSERT + _out_linked_zettel(zettel_id) + " <<}" + " {#" + options["heading-identifier"] + str(ref) + "}"
+			return "#### " + str(ref) + ' ' + _out_commented_id(zettel_id, pre=STR_SIGN_INSERT) + " {#" + options["heading-identifier"] + str(ref) + "}"
 		else:
 			return "#### " + str(ref)
 
 def _out_commented_id(zettel_id, pre = "", post=""):
 	"""
-	Formatted output for -[[id]]
+	Formatted output for [[id]]
 	"""
-	return "{>> " + pre + _out_linked_zettel(zettel_id) + post + " <<}"
+	if options['no-commented-references']:
+		return ''
+	else:
+		return '{>> ' + pre + _out_linked_zettel(zettel_id) + post + ' <<}'
 
 def _out_text_quote(ref, zettel_id):
     """
     Formatted output for quote preamble
     """
-    return '> ' + "{>> " + STR_SIGN_INSERT + _out_linked_zettel(zettel_id) + " <<} " + "**T" + str(ref) + ":**  "
+    return '> ' + _out_commented_id(zettel_id, pre=STR_SIGN_INSERT) + ' **T' + str(ref) + ':**  '
 
 def _out_unindexed_notes():
 	output = [ STR_UNINDEXED_HEADING, "", ""]
@@ -446,7 +450,7 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'O:MH:s:WnSIt:G:v', [ 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index'])
+useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:v', [ 'no-commented-references', 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index'])
 
 _initialize_stack()
 
@@ -463,6 +467,8 @@ for opt, arg in useroptions:
 		options["sleep-time"] = arg
 	elif opt in ('-n', '--no-paragraph-headings'):
 		options["no-paragraph-headings"] = True
+	elif opt in ('-C', 'no-commented-references'):
+		options['no-commented-references'] = True
 	elif opt in ('-S', '--suppress-index'):
 		options["suppress-index"] = True
 	elif opt in ('-I'):
