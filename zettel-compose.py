@@ -36,6 +36,7 @@ options = {
 
 rx_dict = OrderedDict([
 	('ignore', re.compile(r'^(△|○)')),
+	('footnote', re.compile(r'\[\^(?P<fn_id>[a-zA-Z0-9_-]+)]')),
 	('parallel_texts', re.compile(r' *>\[\[(?P<id_left>\d{3,})\]\]::\[\[(?P<id_right>\d{3,})\]\]')), # >[[dddd]]::[[dddd]]
 	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),			#   [[dddd]]:		anywhere in the text, hidden hidden cross reference
 	('cross_ref', re.compile(r'^\[\[(?P<id>\d{3,})\]\]')),				#   [[dddd]]		at the beginning of a line, hidden cross reference
@@ -292,6 +293,10 @@ def parse_zettel(z_item, zettel_id):
         elif key == 'no_ref':
             link = match.group('id')
             left_chunk = rx_dict["no_ref"].sub(_out_commented_id(link), left_chunk)
+
+        elif key == 'footnote':
+            fn_id = match.group('fn_id')
+            left_chunk = rx_dict['footnote'].sub("[^fn-" + zettel_id + "-" + fn_id + "]", left_chunk)
 
         elif key == 'link':
             link = match.group('id')
