@@ -16,11 +16,12 @@ fields_dict = OrderedDict([
 ])
 
 rx_dict = OrderedDict([
+	('link', re.compile(r'\[(?P<anchor>.+)\]\(x-phi://(?P<link>\d{3,})\)')),
 	('footnote', re.compile(r'\[\^(?P<fn_id>[a-zA-Z0-9_-]+)]')),
 	('cross_ref', re.compile(r'\*\*(?P<id>\d{3,})\*\*')) 	# any three-or-more-digit bold text is a wikilink
 ])
 
-title_rx = re.compile(r'(?P<id>\d{3,})\s+(?P<title>.+)$')
+title_rx = re.compile(r'(?P<id>\d{3,})\s+(\|\s+){0,1}(?P<title>.+)$')
 
 phi_id = None
 out_filename = None
@@ -46,6 +47,10 @@ def parse_chunk(chunk):
 	if key == 'footnote':
 		fn_id = match.group('fn_id')
 		left_chunk = rx_dict['footnote'].sub("[^fn-" + phi_id + "-" + fn_id + "]", left_chunk)
+	if (key == 'link'):
+		value = match.group('anchor')
+		link = match.group('link')
+		left_chunk = rx_dict['link'].sub(value + " [[" + link + "]]", left_chunk)
 
 	return left_chunk + parse_chunk(chunk[end:])
 
