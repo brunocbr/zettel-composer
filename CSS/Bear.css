@@ -16,14 +16,14 @@ Modified by Bruno Conte
 
 @font-face {
 	font-family: GreekFont;
-	src: local('Hypatia Sans Pro'), local('Verdana'), local('Arial');
+	src: local('Consolas'), local('Hypatia Sans Pro'), local('Verdana'), local('Arial');
 	font-weight: 300;
 	unicode-range: U+0370-03FF, U+1F00-1FFF;
 }
 
 body {
 	-webkit-font-smoothing: antialiased;
-	font-family:  GreekFont, "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
+	font-family:  GreekFont, Consolas, "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
 	margin: 30px 0 0;
 	padding: 0;
 	background: #fff;
@@ -84,7 +84,7 @@ h6 {
 
 p, td, div {
 	color: #111;
-	font-family: GreekFont, "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
+	font-family: GreekFont, Consolas, "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, Verdana, sans-serif;
 	word-wrap: break-word
 }
 
@@ -394,7 +394,7 @@ table tr:nth-child(even), table td:nth-child(even) {
 }
 
 .critic.inverted.mkshowcomments .criticmarkup .criticcomment {
-	background: #999999 !important;
+	background: #881c1c !important;
 	opacity: 1;
 	color: black;
 	padding-left: 0.5em;
