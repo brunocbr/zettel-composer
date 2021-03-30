@@ -18,6 +18,7 @@ STR_UNINDEXED_HEADING = '# Unindexed'
 STR_STREAMING_ID = "<!--\nzettel-compose.py\n-->\n"
 STR_SIGN_INSERT = '▾ '	# = '▾ '
 STR_SIGN_COMMENT = '▸ ' # =  '❧ '  = '▹ '
+SEPARATOR = [ '\n', '-----', '\n' ]
 
 options = {
 	'no-commented-references': False,
@@ -31,7 +32,8 @@ options = {
     "verbose": False,
     "stream-to-marked": False,
     'parallel-texts-processor': None,
-    'parallel-texts-selection': 'lr'
+    'parallel-texts-selection': 'lr',
+    'no-separator': False
 }
 
 rx_dict = OrderedDict([
@@ -410,6 +412,8 @@ def parse_index(pathname):
 	parse_index.f_out = None
 
 	def write_to_output(contents):
+		if not options['no-separator']:
+			contents = contents + SEPARATOR
 		if parse_index.f_out:
 			for l in contents:
 				parse_index.f_out.write("%s\n" % l)	
@@ -455,7 +459,7 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:v', [ 'no-commented-references', 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index'])
+useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:v', [ 'no-commented-references', 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index', 'no-separator'])
 
 _initialize_stack()
 
@@ -472,6 +476,8 @@ for opt, arg in useroptions:
 		options["sleep-time"] = arg
 	elif opt in ('-n', '--no-paragraph-headings'):
 		options["no-paragraph-headings"] = True
+	elif opt in ('--no-separator'):
+		options["no-separator"] = True
 	elif opt in ('-C', 'no-commented-references'):
 		options['no-commented-references'] = True
 	elif opt in ('-S', '--suppress-index'):
