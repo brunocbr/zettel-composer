@@ -88,6 +88,8 @@ def readFile(filepath):
 	title = match.group('title')
 	out_filename = phi_id + " " + title + ".markdown"
 
+	data.append("# " + title)
+
 	for line in lines[1:]:
 		key, match, end = _parse_line(line, fields_dict)
 		if (key):
@@ -99,7 +101,7 @@ def readFile(filepath):
 		data.append(line)
 
 	h = getHeader(phi_id, title, fields)
-	return h + data
+	return h + [ '' ] + data
 
 phi_dir = sys.argv[1]
 infile = sys.argv[2]
