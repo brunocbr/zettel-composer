@@ -35,7 +35,8 @@ options = {
     'parallel-texts-processor': None,
     'parallel-texts-selection': 'lr',
     'no-separator': False,
-    'handout-mode': False
+    'handout-mode': False,
+    'handout-with-sections': True
 }
 
 rx_dict = OrderedDict([
@@ -357,7 +358,7 @@ def parse_zettel(z_item, zettel_id):
         # our paragraph heading after, not before it
 
         if (key == "md_heading") and not got_content:
-        	if (z_item["type"] != "quote"): # headings in citation notes are ~~for handouts only~~ good for nothing
+        	if (z_item["type"] != "quote" and ((not options['handout-mode']) or options['handout-with-sections'])): # headings in citation notes are ~~for handouts only~~ good for nothing
 	        	data.append(line)
 	        	data.append('')
 	        got_content = False
@@ -380,7 +381,7 @@ def parse_zettel(z_item, zettel_id):
 
         if got_content:
 			if options['handout-mode']:
-				if key == 'md_heading': # && option to reproduce section headings in handouts
+				if key == 'md_heading' and options['handout-with-sections']:
 					data.append(line)
 					data.append('')
 				else:
@@ -493,7 +494,7 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh', [ 'no-commented-references', 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index', 'no-separator'])
+useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:', [ 'no-commented-references', 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index', 'no-separator'])
 
 _initialize_stack()
 
@@ -528,6 +529,8 @@ for opt, arg in useroptions:
 		options["verbose"] = True
 	elif opt in ('-h'):
 		options['handout-mode'] = True
+		options['handout-with-sections'] = ('+' in arg)
+
 
 index_filename = infile[0]
 if options["verbose"]:
