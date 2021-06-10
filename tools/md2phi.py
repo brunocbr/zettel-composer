@@ -2,11 +2,15 @@
 # -*- coding: utf-8 -*-
 
 # md2phi.py
-# 	by Bruno L. Conte <bruno@brunoc.com.br>, 2020
+# 	by Bruno L. Conte <bruno@brunoc.com.br>, 2020-2021
+
+# Syntax:
+# 	md2phi.py <path to notes> <input file>
 
 import re
 from collections import OrderedDict
 import os, sys
+
 
 fields_dict = OrderedDict([
 	('origin', re.compile(r'^origin:\s+(?P<value>.*)$')),
