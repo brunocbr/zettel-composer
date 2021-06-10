@@ -18,6 +18,7 @@ STR_UNINDEXED_HEADING = '# Unindexed'
 STR_STREAMING_ID = "<!--\nzettel-compose.py\n-->\n"
 STR_SIGN_INSERT = '▾ '	# = '▾ '
 STR_SIGN_COMMENT = '▸ ' # =  '❧ '  = '▹ '
+STR_HANDOUT_HEADING = '####'
 SEPARATOR = [ '\n', '-----', '\n' ]
 
 options = {
@@ -33,7 +34,8 @@ options = {
     "stream-to-marked": False,
     'parallel-texts-processor': None,
     'parallel-texts-selection': 'lr',
-    'no-separator': False
+    'no-separator': False,
+    'handout-mode': False
 }
 
 rx_dict = OrderedDict([
@@ -51,7 +53,8 @@ rx_dict = OrderedDict([
 	('link', re.compile(r'\[\[(?P<id>\d{3,})\]\]')),					#   [[dddd]]
 	('yaml_end_div', re.compile(r'^\.\.\.$')),
 	('yaml_div', re.compile(r'^\-\-\-$')),
-	('md_heading', re.compile(r'^#{1,4}[\s\w]'))
+	('md_heading', re.compile(r'^#{1,4}[\s\w]')),
+	('title', re.compile(r'^title:\s*\'(?P<id>.*)\'\s*$'))
 ])
 
 fields_dict = {
@@ -180,7 +183,7 @@ def _out_parallel_texts(left, right):
 	left_data = parse_zettel(z_map[left], left)
 	right_data = parse_zettel(z_map[right], right)
 	output = []
-	if not options['parallel-texts-processor']: # qual será o padrão? esperar quotes nas fichas ou não?
+	if not options['handout-mode'] and not options['parallel-texts-processor']: # qual será o padrão? esperar quotes nas fichas ou não?
 		if ('l' in options['parallel-texts-selection']):
 			output.append(_out_text_quote(z_map[left]["ref"], left))
 			output = output + left_data
@@ -191,6 +194,8 @@ def _out_parallel_texts(left, right):
 			if ('l' in options['parallel-texts-selection']):
 				output.append("> " + _out_commented_id(right, pre=STR_SIGN_INSERT) + '  ')
 			output = output + right_data
+	elif options['handout-mode'] and not options['parallel-texts-processor']:
+		output = left_data + ['\n'] + right_data # will contain header from left note (not perfect...)
 	else:
 		output = None # TODO: implementar processador de textos paralelos
 
@@ -202,6 +207,13 @@ def _parse_line(line, thedict):
 		if match:
 			return key, match, match.end()
 	return None, None, None
+
+def _remove_md_quotes(line):
+	rx = re.compile(r'^\s*>\s*')
+	match = rx.search(line)
+	if match:
+		line = rx.sub("", line)
+	return line
 
 
 def _pandoc_citetext(zettel_id):
@@ -320,6 +332,7 @@ def parse_zettel(z_item, zettel_id):
     with open(filepath, 'r') as file_object:
     	lines = file_object.read().splitlines()
 
+    zettel_title = 'Untitled'
     for line in lines:
     	insert_quotes = []
     	insert_parallel_texts = []
@@ -329,6 +342,8 @@ def parse_zettel(z_item, zettel_id):
 
         if yaml_divert:
 	       	yaml_divert = not key in ["yaml_div", "yaml_end_div"]
+	       	if key == 'title':
+	       		zettel_title = match.group('id')
 	       	continue
 
         if key == "yaml_div":
@@ -342,26 +357,42 @@ def parse_zettel(z_item, zettel_id):
         # our paragraph heading after, not before it
 
         if (key == "md_heading") and not got_content:
-        	if (z_item["type"] != "quote"): # headings in citation notes are for handouts only
+        	if (z_item["type"] != "quote"): # headings in citation notes are ~~for handouts only~~ good for nothing
 	        	data.append(line)
 	        	data.append('')
 	        got_content = False
         	continue
 
         if (not line == '') and not got_content:
-        	if (z_item["type"] == "body"):
-        		data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
-        	elif (z_item["type"] == "quote"):
-        		data.append(_out_text_quote(z_item["ref"], zettel_id))
-        	elif (z_item["type"] in [ 'sequential' ]):
-        		data.append(_out_commented_id(zettel_id, pre=STR_SIGN_INSERT))	        	
-        	got_content = True
+			if (not options['handout-mode']):
+				if (z_item["type"] == "body"):
+					data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
+				elif (z_item["type"] == "quote"):
+					data.append(_out_text_quote(z_item["ref"], zettel_id))
+				elif (z_item["type"] in [ 'sequential' ]):
+					data.append(_out_commented_id(zettel_id, pre=STR_SIGN_INSERT))
+			elif (z_item['type'] in ['quote', 'left_text']): # headings in handout before content
+					data.append(STR_HANDOUT_HEADING + ' ' + zettel_title)
+					data.append(_out_commented_id(zettel_id, pre=STR_SIGN_INSERT))
+			elif (z_item['type'] == 'right_text'):
+					data.append(_out_commented_id(zettel_id, pre=STR_SIGN_INSERT))
+			got_content = True
 
-       	if got_content:
-       		line = parse_chunk(line)
-	       	data.append(line)
+        if got_content:
+			if options['handout-mode']:
+				if key == 'md_heading': # && option to reproduce section headings in handouts
+					data.append(line)
+					data.append('')
+				else:
+					line = parse_chunk(line)
+					if z_item['type'] in ['left_text', 'right_text', 'quote']:
+						line = _remove_md_quotes(line)
+						data.append(line)
+			else:
+				line = parse_chunk(line)
+				data.append(line)
 
-		if insert_sequence is not []:
+        if insert_sequence is not []:
 			for i in insert_sequence:
 				_z_add_to_stack(i, "sequential")
 				data = data + ['\n'] + parse_zettel(z_map[i], i)
@@ -370,7 +401,7 @@ def parse_zettel(z_item, zettel_id):
        		for i in insert_quotes:
        			_z_add_to_stack(i, "quote")					# add to stack...
        			insert_data = parse_zettel(z_map[i], i)
-       			data = data + ['\n'] + insert_data 						# ...but insert immediately after line
+       			data = data + ['\n'] + insert_data 			# ...but insert immediately after line
 
        	if insert_parallel_texts is not []:
        		for l, r in insert_parallel_texts:
@@ -462,7 +493,7 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:v', [ 'no-commented-references', 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index', 'no-separator'])
+useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh', [ 'no-commented-references', 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index', 'no-separator'])
 
 _initialize_stack()
 
@@ -495,6 +526,8 @@ for opt, arg in useroptions:
 		options['parallel-texts-selection'] = arg
 	elif opt in ('-v'):
 		options["verbose"] = True
+	elif opt in ('-h'):
+		options['handout-mode'] = True
 
 index_filename = infile[0]
 if options["verbose"]:
