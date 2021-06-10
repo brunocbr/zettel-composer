@@ -39,14 +39,14 @@ options = {
 rx_dict = OrderedDict([
 	('ignore', re.compile(r'^(△|○)')),
 	('footnote', re.compile(r'\[\^(?P<fn_id>[a-zA-Z0-9_-]+)]')),
-	('parallel_texts', re.compile(r' *>\[\[(?P<id_left>\d{3,})\]\]::\[\[(?P<id_right>\d{3,})\]\]')), # >[[dddd]]::[[dddd]]
+	('parallel_texts', re.compile(r' *>\s{0,1}\[\[(?P<id_left>\d{3,})\]\]::\[\[(?P<id_right>\d{3,})\]\]')), # >[[dddd]]::[[dddd]]
 	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),			#   [[dddd]]:		anywhere in the text, hidden hidden cross reference
 	('cross_ref', re.compile(r'^\[\[(?P<id>\d{3,})\]\]')),				#   [[dddd]]		at the beginning of a line, hidden cross reference
 	('pandoc_cite_noauthor', re.compile(r'-@\[\[(?P<id>\d{3,})\]\]')),	# -@[[dddd]]
 	('pandoc_cite_inline', re.compile(r'@@\[\[(?P<id>\d{3,})\]\]')),	# @@[[dddd]]
 	('pandoc_cite', re.compile(r'@\[\[(?P<id>\d{3,})\]\]')),			#  @[[dddd]]
 	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),					#  -[[dddd]]		do not add note
-	('quote', re.compile(r' *>\[\[(?P<id>\d{3,})\]\]')), 				#  >[[dddd]]		insert quote immediately
+	('quote', re.compile(r' *>\s{0,1}\[\[(?P<id>\d{3,})\]\]')), 				#  >[[dddd]]		insert quote immediately
 	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')), 				#  +[[dddd]]		insert note immediately
 	('link', re.compile(r'\[\[(?P<id>\d{3,})\]\]')),					#   [[dddd]]
 	('yaml_end_div', re.compile(r'^\.\.\.$')),
@@ -55,8 +55,9 @@ rx_dict = OrderedDict([
 ])
 
 fields_dict = {
-	"citekey": re.compile(r'^' + KEY_CITEKEY + r':[ \t]*(?P<id>[A-Za-z\d:]+) *$'),
-	"loc": re.compile(r'^' + KEY_LOCATION + r':[ \t]*(?P<id>[\d-]+) *$')
+	"citekey": re.compile(r'^' + KEY_CITEKEY + r':[ \t]*(?P<id>[A-Za-z\d:]+)\s*$'),
+	# "loc": re.compile(r'^' + KEY_LOCATION + r':[ \t]*(?P<id>[\d-]+)\s*$')
+	"loc": re.compile(r'^' + KEY_LOCATION + r':[ \t]*(?P<id>[\S]+)\s*$')
 }
 
 def _initialize_stack():
@@ -179,7 +180,7 @@ def _out_parallel_texts(left, right):
 	left_data = parse_zettel(z_map[left], left)
 	right_data = parse_zettel(z_map[right], right)
 	output = []
-	if not options['parallel-texts-processor']:
+	if not options['parallel-texts-processor']: # qual será o padrão? esperar quotes nas fichas ou não?
 		if ('l' in options['parallel-texts-selection']):
 			output.append(_out_text_quote(z_map[left]["ref"], left))
 			output = output + left_data
@@ -190,6 +191,8 @@ def _out_parallel_texts(left, right):
 			if ('l' in options['parallel-texts-selection']):
 				output.append("> " + _out_commented_id(right, pre=STR_SIGN_INSERT) + '  ')
 			output = output + right_data
+	else:
+		output = None # TODO: implementar processador de textos paralelos
 
 	return output
 
