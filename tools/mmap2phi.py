@@ -45,9 +45,9 @@ def parse_chunk(chunk):
 
 	return chunk
 
-def getHeader(zettel_id, title):
+def getHeader(zettel_id, title, filename, path):
 	header = [ "---", "title:\t'" + title + "'  ", "id:\t\tΦ" + zettel_id + "  ",
-		'origin:\t' + MINDNODE_URI + '/open?name=' + quote(zettel_id + ' ' + title) + '.mindnode&path=' + MINDNODE_PHI_PATH ]
+		'origin:\t' + MINDNODE_URI + '/open?name=' + quote(filename) + '.mindnode&path=' + path ]
 
 	header.append("...")
 	header.append("")
@@ -55,7 +55,7 @@ def getHeader(zettel_id, title):
 	return header
 
 def readFile(infile):
-	global rx_dict
+	global rx_dict, out_filename
 
 	data = []
 	got_list_item = False
@@ -65,7 +65,15 @@ def readFile(infile):
 	with open(infile, 'r') as file_obj:
 		lines = file_obj.read().splitlines()
 
-	for line in lines:
+	match = title_rx.search(lines[0])
+	if not match:
+		raise Exception("Invalid file name for note detected in the first line")
+	phi_id = match.group('id')
+	title = match.group('title')
+	out_filename = phi_dir + '/' + phi_id + ' ' + title + '.markdown'
+	data.append('# ' + title)
+
+	for line in lines[1:]:
 		line = parse_chunk(line)
 		atx_header = rx_dict['atx_header'].search(line)
 
@@ -79,20 +87,17 @@ def readFile(infile):
 		else:
 			got_blank = True
 
-	h = getHeader(phi_id, title)
+	h = getHeader(phi_id, title, title_basename, mindnode_path)
 	return h + data
 
 phi_dir = sys.argv[1]
 infile = sys.argv[2]
+mindnode_path = sys.argv[3]
 title_basename = os.path.splitext(os.path.basename(infile))[0]
 
-match = title_rx.search(title_basename)
-if not match:
-	raise Exception("Invalid file name for note detected in the first line")
-
-phi_id = match.group('id')
-title = match.group('title')
-out_filename = phi_dir + '/' + phi_id + ' ' + title + '.markdown'
+# match = title_rx.search(title_basename)
+# if not match:
+#	raise Exception("Invalid file name for note detected in the first line")
 
 d = readFile(infile)
 
