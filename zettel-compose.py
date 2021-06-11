@@ -216,6 +216,11 @@ def _remove_md_quotes(line):
 		line = rx.sub("", line)
 	return line
 
+def _md_quote(line):
+	line = _remove_md_quotes(line)
+	line = '> ' + line
+	return line
+
 
 def _pandoc_citetext(zettel_id):
 	"""
@@ -391,6 +396,8 @@ def parse_zettel(z_item, zettel_id):
 						data.append(line)
 			else:
 				line = parse_chunk(line)
+				if (z_item['type'] in ['quote', 'left_text', 'right_text']): # enforce quotes when not printing handouts
+					line = _md_quote(line)
 				data.append(line)
 
         if insert_sequence is not []:
@@ -410,6 +417,11 @@ def parse_zettel(z_item, zettel_id):
        			_z_add_to_stack(r, 'right_text')
        			insert_data = _out_parallel_texts(l, r)
        			data = data + ['\n'] + insert_data
+
+    if (z_item['type'] in ['right_text']) and not options['handout-mode']:
+    	while (data[-1] is '\n'):
+    		del data[-1]
+    	data[-1] = data[-1] + ' (' + zettel_title + ')'
 
     return data
 
