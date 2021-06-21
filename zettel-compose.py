@@ -44,15 +44,15 @@ rx_dict = OrderedDict([
 	('ignore', re.compile(r'^(△|○)')),
 	('footnote', re.compile(r'\[\^(?P<fn_id>[a-zA-Z0-9_-]+)]')),
 	('parallel_texts', re.compile(r' *>\s{0,1}\[\[(?P<id_left>\d{3,})\]\]::\[\[(?P<id_right>\d{3,})\]\]')), # >[[dddd]]::[[dddd]]
-	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),			#   [[dddd]]:		anywhere in the text, hidden hidden cross reference
-	('cross_ref', re.compile(r'^\[\[(?P<id>\d{3,})\]\]')),				#   [[dddd]]		at the beginning of a line, hidden cross reference
 	('pandoc_cite_noauthor', re.compile(r'-@\[\[(?P<id>\d{3,})\]\]')),	# -@[[dddd]]
 	('pandoc_cite_inline', re.compile(r'@@\[\[(?P<id>\d{3,})\]\]')),	# @@[[dddd]]
 	('pandoc_cite', re.compile(r'@\[\[(?P<id>\d{3,})\]\]')),			#  @[[dddd]]
 	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),					#  -[[dddd]]		do not add note
 	('quote', re.compile(r' *>\s{0,1}\[\[(?P<id>\d{3,})\]\]')), 		#  >[[dddd]]		insert quote immediately
 	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')), 				#  +[[dddd]]		insert note immediately
-	('link', re.compile(r'\[\[(?P<id>\d{3,})\]\]')),					#   [[dddd]]
+	('link', re.compile(r'§\[\[(?P<id>\d{3,})\]\]')),					#  §[[dddd]]
+	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),			#   [[dddd]]:		anywhere in the text, hidden hidden cross reference
+	('cross_ref', re.compile(r'\s*\[\[(?P<id>\d{3,})\]\]')),				#   [[dddd]]		hidden cross reference
 	('yaml_end_div', re.compile(r'^\.\.\.$')),
 	('yaml_div', re.compile(r'^\-\-\-$')),
 	('md_heading', re.compile(r'^#{1,4}[\s\w]')),
