@@ -183,7 +183,7 @@ def _out_unindexed_notes():
 		output.append(os.path.splitext(base)[0] + " " + _out_link(z_map[n]['ref'], n) + ".")
 	return output
 
-def _out_external_parallel_texts(left_text, right_text):
+def _out_latex_parallel_texts(left_text, right_text):
 	CMD = [CF_PANDOC, '-f', 'markdown', '-t', 'latex']
 
 	ps = subprocess.Popen(CMD,stdin=subprocess.PIPE,stdout=subprocess.PIPE)
@@ -191,9 +191,6 @@ def _out_external_parallel_texts(left_text, right_text):
 
 	ps = subprocess.Popen(CMD,stdin=subprocess.PIPE,stdout=subprocess.PIPE)
 	right_text = (ps.communicate(input="\n".join(right_text))[0]).splitlines()
-
-	# ps = subprocess.Popen(CMD,stdin=right_text,stdout=subprocess.PIPE)
-	# right_text = ps.communicate()[0]
 
 	output = ['\ParallelTexts{%'] + left_text + ['}{'] + right_text + ['}'] + ['']
 	return output
@@ -219,7 +216,7 @@ def _out_parallel_texts(left, right):
 		if not options['parallel-texts-processor']:
 			output = output + left_data + ['\n'] + right_data
 		else:
-			output = output + _out_external_parallel_texts(left_data, right_data)
+			output = output + _out_latex_parallel_texts(left_data, right_data)
 
 	return output
 
