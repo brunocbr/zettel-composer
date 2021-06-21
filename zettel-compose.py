@@ -9,6 +9,7 @@ from glob import glob
 from collections import OrderedDict
 import os, time, sys, getopt
 import hashlib
+import subprocess
 
 KEY_CITEKEY = 'citekey'
 KEY_LOCATION = 'loc'
@@ -49,7 +50,7 @@ rx_dict = OrderedDict([
 	('pandoc_cite_inline', re.compile(r'@@\[\[(?P<id>\d{3,})\]\]')),	# @@[[dddd]]
 	('pandoc_cite', re.compile(r'@\[\[(?P<id>\d{3,})\]\]')),			#  @[[dddd]]
 	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),					#  -[[dddd]]		do not add note
-	('quote', re.compile(r' *>\s{0,1}\[\[(?P<id>\d{3,})\]\]')), 				#  >[[dddd]]		insert quote immediately
+	('quote', re.compile(r' *>\s{0,1}\[\[(?P<id>\d{3,})\]\]')), 		#  >[[dddd]]		insert quote immediately
 	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')), 				#  +[[dddd]]		insert note immediately
 	('link', re.compile(r'\[\[(?P<id>\d{3,})\]\]')),					#   [[dddd]]
 	('yaml_end_div', re.compile(r'^\.\.\.$')),
@@ -180,11 +181,26 @@ def _out_unindexed_notes():
 		output.append(os.path.splitext(base)[0] + " " + _out_link(z_map[n]['ref'], n) + ".")
 	return output
 
+def _out_external_parallel_texts(left_text, right_text):
+	CMD = ['/usr/local/bin/pandoc', '-f', 'markdown', '-t', 'latex']
+
+	ps = subprocess.Popen(CMD,stdin=subprocess.PIPE,stdout=subprocess.PIPE)
+	left_text = (ps.communicate(input="\n".join(left_text))[0]).splitlines()
+
+	ps = subprocess.Popen(CMD,stdin=subprocess.PIPE,stdout=subprocess.PIPE)
+	right_text = (ps.communicate(input="\n".join(right_text))[0]).splitlines()
+
+	# ps = subprocess.Popen(CMD,stdin=right_text,stdout=subprocess.PIPE)
+	# right_text = ps.communicate()[0]
+
+	output = ['\ParallelTexts{%'] + left_text + ['}{'] + right_text + ['}'] + ['']
+	return output
+
 def _out_parallel_texts(left, right):
 	left_data = parse_zettel(z_map[left], left)
 	right_data = parse_zettel(z_map[right], right)
 	output = []
-	if not options['handout-mode'] and not options['parallel-texts-processor']: # qual será o padrão? esperar quotes nas fichas ou não?
+	if not options['handout-mode']: # qual será o padrão? esperar quotes nas fichas ou não?
 		if ('l' in options['parallel-texts-selection']):
 			output.append(_out_text_quote(z_map[left]["ref"], left))
 			output = output + left_data
@@ -195,10 +211,13 @@ def _out_parallel_texts(left, right):
 			if ('l' in options['parallel-texts-selection']):
 				output.append("> " + _out_commented_id(right, pre=STR_SIGN_INSERT) + '  ')
 			output = output + right_data
-	elif options['handout-mode'] and not options['parallel-texts-processor']:
-		output = left_data + ['\n'] + right_data # will contain header from left note (not perfect...)
 	else:
-		output = None # TODO: implementar processador de textos paralelos
+		output.append(STR_HANDOUT_HEADING + ' ' + z_map[right]['title'])
+		output.append('')
+		if not options['parallel-texts-processor']:
+			output = output + left_data + ['\n'] + right_data
+		else:
+			output = output + _out_external_parallel_texts(left_data, right_data)
 
 	return output
 
@@ -323,7 +342,7 @@ def parse_zettel(z_item, zettel_id):
 
         elif key == 'link':
             link = match.group('id')
-            if (link in z_map) and (z_map[link]["type"] == "quote"):
+            if (link in z_map) and (z_map[link]["type"] in ['quote', 'left_text', 'right_text']):
                 left_chunk = rx_dict["link"].sub(_out_quoteref(z_map[link]["ref"], link), left_chunk) 
        	    elif (z_item["type"] not in [ "citation" ]) and ((z_item["type"] == "index") or (options["only-link-from-index"] is not True)):
 	            if (link not in z_map) and (z_item["type"] not in [ "index", "sequential" ]):
@@ -350,6 +369,7 @@ def parse_zettel(z_item, zettel_id):
 	       	yaml_divert = not key in ["yaml_div", "yaml_end_div"]
 	       	if key == 'title':
 	       		zettel_title = match.group('id')
+	       		z_item['title'] = zettel_title
 	       	continue
 
         if key == "yaml_div":
@@ -377,10 +397,10 @@ def parse_zettel(z_item, zettel_id):
 					data.append(_out_text_quote(z_item["ref"], zettel_id))
 				elif (z_item["type"] in [ 'sequential' ]):
 					data.append(_out_commented_id(zettel_id, pre=STR_SIGN_INSERT))
-			elif (z_item['type'] in ['quote', 'left_text']): # headings in handout before content
+			elif (z_item['type'] in ['quote']): # headings in handout before content
 					data.append(STR_HANDOUT_HEADING + ' ' + zettel_title)
 					data.append(_out_commented_id(zettel_id, pre=STR_SIGN_INSERT))
-			elif (z_item['type'] == 'right_text'):
+			elif (z_item['type'] in ['left_text', 'right_text']) and not options['no-commented-references']:
 					data.append(_out_commented_id(zettel_id, pre=STR_SIGN_INSERT))
 			got_content = True
 
@@ -420,8 +440,8 @@ def parse_zettel(z_item, zettel_id):
 
     if (z_item['type'] in ['right_text']) and not options['handout-mode']:
     	while (data[-1] is '\n'):
-    		del data[-1]
-    	data[-1] = data[-1] + ' (' + zettel_title + ')'
+    		del data[-1]									# remove trailing lines
+    	data[-1] = data[-1] + ' (' + zettel_title + ')'		# add reference to last line in quote
 
     return data
 
@@ -506,7 +526,7 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:', [ 'no-commented-references', 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index', 'no-separator'])
+useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:P', [ 'no-commented-references', 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index', 'no-separator'])
 
 _initialize_stack()
 
@@ -542,6 +562,9 @@ for opt, arg in useroptions:
 	elif opt in ('-h'):
 		options['handout-mode'] = True
 		options['handout-with-sections'] = ('+' in arg)
+	elif opt in ('-P'):
+		options['parallel-texts-processor'] = True
+		options['no-commented-references'] = True
 
 
 index_filename = infile[0]
