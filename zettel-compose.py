@@ -269,14 +269,14 @@ def _pandoc_citetext(zettel_id):
 def _pandoc_cite(zettel_id, parenthetical = True):
 	citetext = _pandoc_citetext(zettel_id)
 	if citetext and parenthetical:
-		return "[@" + citetext + "]"
+		return "[@" + citetext + "]" + _out_commented_id(zettel_id, pre=STR_SIGN_COMMENT)
 	elif citetext:
-		return "@" + citetext
+		return "@" + citetext + _out_commented_id(zettel_id, pre=STR_SIGN_COMMENT)
 
 def _pandoc_cite_noauthor(zettel_id):
 	citetext = _pandoc_citetext(zettel_id)
 	if citetext:
-		return "[-@" + citetext + "]"
+		return "[-@" + citetext + "]" + _out_commented_id(zettel_id, pre=STR_SIGN_COMMENT)
 
 def parse_zettel(z_item, zettel_id):
     global options, z_map, unindexed_links
