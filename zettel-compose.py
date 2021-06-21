@@ -14,6 +14,8 @@ import subprocess
 KEY_CITEKEY = 'citekey'
 KEY_LOCATION = 'loc'
 
+CF_PANDOC ='/usr/local/bin/pandoc'
+
 STR_ZETTEL_URL = 'thearchive://match/'
 STR_UNINDEXED_HEADING = '# Unindexed'
 STR_STREAMING_ID = "<!--\nzettel-compose.py\n-->\n"
@@ -182,7 +184,7 @@ def _out_unindexed_notes():
 	return output
 
 def _out_external_parallel_texts(left_text, right_text):
-	CMD = ['/usr/local/bin/pandoc', '-f', 'markdown', '-t', 'latex']
+	CMD = [CF_PANDOC, '-f', 'markdown', '-t', 'latex']
 
 	ps = subprocess.Popen(CMD,stdin=subprocess.PIPE,stdout=subprocess.PIPE)
 	left_text = (ps.communicate(input="\n".join(left_text))[0]).splitlines()
