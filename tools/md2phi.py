@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # md2phi.py
@@ -22,7 +22,8 @@ fields_dict = OrderedDict([
 rx_dict = OrderedDict([
 	('link', re.compile(r'\[(?P<anchor>.+)\]\(x-phi://(?P<link>\d{3,})\)')),
 	('footnote', re.compile(r'\[\^(?P<fn_id>[a-zA-Z0-9_-]+)]')),
-	('cross_ref', re.compile(r'\*\*(?P<id>\d{3,})\*\*')) 	# any three-or-more-digit bold text is a wikilink
+	('cross_ref', re.compile(r'\*\*(?P<id>\d{3,})\*\*')), 	# any three-or-more-digit bold text is a wikilink
+ 	('alt_cross_ref', re.compile(r'[►▹❦❧❡▶︎☞☛▷Φ](?P<id>\d{3,})\b', re.UNICODE))	
 ])
 
 title_rx = re.compile(r'(?P<id>\d{3,})\s+(\|\s+){0,1}(?P<title>.+)$')
@@ -45,9 +46,9 @@ def parse_chunk(chunk):
 		return chunk
 
 	left_chunk = chunk[:end]
-	if key == 'cross_ref':
+	if key in ['cross_ref','alt_cross_ref']:
 		ref_id = match.group('id')
-		left_chunk = rx_dict['cross_ref'].sub("[[" + ref_id + "]]", left_chunk)
+		left_chunk = rx_dict[key].sub("[[" + ref_id + "]]", left_chunk)
 	if key == 'footnote':
 		fn_id = match.group('fn_id')
 		left_chunk = rx_dict['footnote'].sub("[^fn-" + phi_id + "-" + fn_id + "]", left_chunk)
