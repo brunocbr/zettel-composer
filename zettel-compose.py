@@ -52,9 +52,9 @@ rx_dict = OrderedDict([
 	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),					#  -[[dddd]]		do not add note
 	('quote', re.compile(r' *>\s{0,1}\[\[(?P<id>\d{3,})\]\]')), 		#  >[[dddd]]		insert quote immediately
 	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')), 				#  +[[dddd]]		insert note immediately
-	('link', re.compile(r'§\[\[(?P<id>\d{3,})\]\]')),					#  §[[dddd]]
-	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),			#   [[dddd]]:		anywhere in the text, hidden hidden cross reference
-	('cross_ref', re.compile(r'\s*\[\[(?P<id>\d{3,})\]\]')),				#   [[dddd]]		hidden cross reference
+	('link', re.compile(r'§\[\[(?P<id>\d{3,})\]\]')),					#  §[[dddd]]		print reference to paragraph or text
+	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),			#   [[dddd]]:		hidden cross reference
+	('cross_ref', re.compile(r'\s*\[\[(?P<id>\d{3,})\]\]')),			#   [[dddd]]		hidden cross reference
 	('yaml_end_div', re.compile(r'^\.\.\.$')),
 	('yaml_div', re.compile(r'^\-\-\-$')),
 	('md_heading', re.compile(r'^#{1,4}[\s\w]')),
