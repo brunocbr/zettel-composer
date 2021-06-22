@@ -10,6 +10,7 @@
 import re
 from collections import OrderedDict
 import os, sys
+from datetime import datetime
 
 
 fields_dict = OrderedDict([
@@ -61,8 +62,9 @@ def parse_chunk(chunk):
 
 def getHeader(zettel_id, title, fields):
 	header = [ "---", "title:\t'" + title + "'  ", "id:\t\tΦ" + zettel_id + "  "]
+	fields['datetime'] = datetime.now().isoformat(timespec='minutes') # strftime('%d %B %Y %H:%M')
 	for k in fields.keys():
-			if k in ["origin", "tags"]:
+			if k not in ['uplink']:
 				if (len(k) < 5):
 					tabs = "\t\t"
 				else:
