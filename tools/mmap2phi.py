@@ -12,6 +12,7 @@ MINDNODE_PHI_PATH = 'phi'
 
 rx_dict = OrderedDict([
 #	('task', re.compile(r'\[(?P<status>.)\]\s+(?P<task>.*)')),
+	('paragraph-link', re.compile(r'\[§\s+(?P<anchor>.+)\]\(x-phi://(?P<link>\d{3,})\)')),
 	('link', re.compile(r'\[(?P<anchor>.+)\]\(x-phi://(?P<link>\d{3,})\)')),
 	('list_entry', re.compile(r'^\s*- (?P<entry>.*)$')),
 	('atx_header', re.compile(r'^#+'))
@@ -27,10 +28,14 @@ def parse_chunk(chunk):
 		if match:
 			left_chunk = chunk[:match.end()]
 
+			if (key == 'paragraph-link'):
+				value = match.group('anchor')
+				link = match.group(key)
+				left_chunk = rx_dict[key].sub(value + " §[[" + link + "]]", left_chunk)
 			if (key == 'link'):
 				value = match.group('anchor')
-				link = match.group('link')
-				left_chunk = rx_dict['link'].sub(value + " [[" + link + "]]", left_chunk)
+				link = match.group(key)
+				left_chunk = rx_dict[key].sub(value + " [[" + link + "]]", left_chunk)
 
 #			if (key == 'list_entry'):
 #				value = match.group('entry')
