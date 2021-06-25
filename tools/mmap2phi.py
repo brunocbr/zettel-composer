@@ -31,7 +31,7 @@ def parse_chunk(chunk):
 			if (key == 'paragraph-link'):
 				value = match.group('anchor')
 				link = match.group('link')
-				left_chunk = rx_dict[key].sub(" §[[" + link + "]] " + value, left_chunk)
+				left_chunk = rx_dict[key].sub("§[[" + link + "]]. " + value, left_chunk)
 			if (key == 'link'):
 				value = match.group('anchor')
 				link = match.group('link')
