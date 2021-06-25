@@ -476,4 +476,4 @@ table tr:nth-child(even), table td:nth-child(even) {
 
 .mkstyle--swiss #wrapper aside.blurb:before {
 	margin-top: .7em
-}
+}  padding: 50px;
