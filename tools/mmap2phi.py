@@ -18,7 +18,7 @@ rx_dict = OrderedDict([
 	('atx_header', re.compile(r'^#+'))
 ])
 
-title_rx = re.compile(r'(?P<id>\d{3,})\s+(?P<title>.+)$')
+title_rx = re.compile(r'(?P<id>\d{3,})\s+(\|\s+){0,1}(?P<title>.+)$')
 
 def parse_chunk(chunk):
 	global rx_dict
