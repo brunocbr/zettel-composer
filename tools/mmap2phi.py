@@ -30,11 +30,11 @@ def parse_chunk(chunk):
 
 			if (key == 'paragraph-link'):
 				value = match.group('anchor')
-				link = match.group(key)
-				left_chunk = rx_dict[key].sub(value + " §[[" + link + "]]", left_chunk)
+				link = match.group('link')
+				left_chunk = rx_dict[key].sub(" §[[" + link + "]] " + value, left_chunk)
 			if (key == 'link'):
 				value = match.group('anchor')
-				link = match.group(key)
+				link = match.group('link')
 				left_chunk = rx_dict[key].sub(value + " [[" + link + "]]", left_chunk)
 
 #			if (key == 'list_entry'):
