@@ -46,7 +46,7 @@ options = {
 rx_dict = OrderedDict([
 	('ignore', re.compile(r'^(△|○)')),
 	('footnote', re.compile(r'\[\^(?P<fn_id>[a-zA-Z0-9_-]+)]')),
-	('parallel_texts', re.compile(r' *>\s{0,1}\[\[(?P<id_left>\d{3,})\]\] *:: *\[\[(?P<id_right>\d{3,})\]\]')), # >[[dddd]] :: [[dddd]]
+	('parallel_texts', re.compile(r' *>\s{0,1} *\[\[(?P<id_left>\d{3,})\]\] *:: *\[\[(?P<id_right>\d{3,})\]\]')), # > [[dddd]] :: [[dddd]]
 	('pandoc_cite_noauthor', re.compile(r'-@ *\[\[(?P<id>\d{3,})\]\]')),# -@ [[dddd]]
 	('pandoc_cite_inline', re.compile(r'@@ *\[\[(?P<id>\d{3,})\]\]')),	# @@ [[dddd]]
 	('pandoc_cite', re.compile(r'@ *\[\[(?P<id>\d{3,})\]\]')),			#  @ [[dddd]]
