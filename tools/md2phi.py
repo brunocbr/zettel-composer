@@ -28,7 +28,7 @@ rx_dict = OrderedDict([
 	('text', re.compile(r'❖(?P<id>\d{3,})\b', re.UNICODE)), # text
 	('paragraph', re.compile(r'❡(?P<id>\d{3,})', re.UNICODE)), # special symbol for reference to paragraph of text
 	('citation', re.compile(r'❦(?P<id>\d{3,})', re.UNICODE)), # cite reference
- 	('alt_cross_ref', re.compile(r'[►▹❧▶︎☞☛▷Φ](?P<id>\d{3,})\b', re.UNICODE))	
+ 	('alt_cross_ref', re.compile(r'[▸►▹❧▶︎☞☛▷Φ](?P<id>\d{3,})\b', re.UNICODE))	
 ])
 
 title_rx = re.compile(r'(?P<id>\d{3,})\s+(\|\s+){0,1}(?P<title>.+)$')
@@ -60,7 +60,7 @@ def parse_chunk(chunk):
 	if (key == 'link'):
 		value = match.group('anchor')
 		link = match.group('link')
-		left_chunk = rx_dict['link'].sub(value + " [[" + link + "]]", left_chunk)
+		left_chunk = rx_dict['link'].sub(value + " §[[" + link + "]]", left_chunk)
 	if (key == 'paragraph'):
 		ref_id = match.group('id')
 		left_chunk = rx_dict[key].sub("§[[" + ref_id + "]]", left_chunk)
@@ -112,7 +112,7 @@ def readFile(filepath):
 	title = match.group('title')
 	out_filename = phi_id + " " + title + ".markdown"
 
-	data.append("# " + title)
+	# data.append("# " + title)
 
 	for line in lines[1:]:
 		key, match, end = _parse_line(line, fields_dict)
@@ -130,6 +130,8 @@ def readFile(filepath):
 phi_dir = sys.argv[1]
 infile = sys.argv[2]
 d = readFile(infile)
+
+d.append('<!-- WARNING: Do not edit directly! -->')
 
 with open(phi_dir + "/" + out_filename, "w") as f_out:
 	for l in d:

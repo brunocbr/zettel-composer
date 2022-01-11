@@ -39,21 +39,22 @@ options = {
     'parallel-texts-selection': 'lr',
     'no-separator': False,
     'handout-mode': False,
-    'handout-with-sections': True
+    'handout-with-sections': True,
+    'link-all': False # link normal wikilinks 
 }
 
 rx_dict = OrderedDict([
 	('ignore', re.compile(r'^(△|○)')),
 	('footnote', re.compile(r'\[\^(?P<fn_id>[a-zA-Z0-9_-]+)]')),
 	('parallel_texts', re.compile(r' *>\s{0,1}\[\[(?P<id_left>\d{3,})\]\]::\[\[(?P<id_right>\d{3,})\]\]')), # >[[dddd]]::[[dddd]]
-	('pandoc_cite_noauthor', re.compile(r'-@\[\[(?P<id>\d{3,})\]\]')),	# -@[[dddd]]
-	('pandoc_cite_inline', re.compile(r'@@\[\[(?P<id>\d{3,})\]\]')),	# @@[[dddd]]
-	('pandoc_cite', re.compile(r'@\[\[(?P<id>\d{3,})\]\]')),			#  @[[dddd]]
-	('no_ref', re.compile(r'-\[\[(?P<id>\d{3,})\]\]')),					#  -[[dddd]]		do not add note
-	('quote', re.compile(r' *>\s{0,1}\[\[(?P<id>\d{3,})\]\]')), 		#  >[[dddd]]		insert quote immediately
-	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')), 				#  +[[dddd]]		insert note immediately
-	('link', re.compile(r'§\[\[(?P<id>\d{3,})\]\]')),					#  §[[dddd]]		print reference to paragraph or text
-	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\]:')),			#   [[dddd]]:		hidden cross reference
+	('pandoc_cite_noauthor', re.compile(r'-@ *\[\[(?P<id>\d{3,})\]\]')),# -@ [[dddd]]
+	('pandoc_cite_inline', re.compile(r'@@ *\[\[(?P<id>\d{3,})\]\]')),	# @@ [[dddd]]
+	('pandoc_cite', re.compile(r'@ *\[\[(?P<id>\d{3,})\]\]')),			#  @ [[dddd]]
+	('no_ref', re.compile(r'- *\[\[(?P<id>\d{3,})\]\]')),		   		#  - [[dddd]]		do not add note
+	('quote', re.compile(r' *>\s{0,1}\[\[(?P<id>\d{3,})\]\]')), 		#  > [[dddd]]		insert quote immediately
+	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')), 				#  + [[dddd]]		insert note immediately
+	('link', re.compile(r'§ *\[\[(?P<id>\d{3,})\]\]')),					#  § [[dddd]]		print reference to paragraph or text
+	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\] *:')),   		#   [[dddd]] :		hidden cross reference
 	('cross_ref', re.compile(r'\s*\[\[(?P<id>\d{3,})\]\]')),			#   [[dddd]]		hidden cross reference
 	('yaml_end_div', re.compile(r'^\.\.\.$')),
 	('yaml_div', re.compile(r'^\-\-\-$')),
@@ -157,9 +158,9 @@ def _out_paragraph_heading(ref, zettel_id):
 		return  _out_commented_id(zettel_id)
 	else:
 		if options["heading-identifier"]:
-			return "#### " + str(ref) + ' ' + _out_commented_id(zettel_id, pre=STR_SIGN_INSERT) + " {#" + options["heading-identifier"] + str(ref) + "}"
+			return "#### " + str(ref) + '. ' + _out_commented_id(zettel_id, pre=STR_SIGN_INSERT) + " {#" + options["heading-identifier"] + str(ref) + "}"
 		else:
-			return "#### " + str(ref)
+			return "#### " + str(ref) + '. '
 
 def _out_commented_id(zettel_id, pre = "", post=""):
 	"""
@@ -168,7 +169,7 @@ def _out_commented_id(zettel_id, pre = "", post=""):
 	if options['no-commented-references']:
 		return ''
 	else:
-		return '{>> ' + pre + _out_linked_zettel(zettel_id) + post + ' <<}'
+		return ' {>> ' + pre + _out_linked_zettel(zettel_id) + post + ' <<}'
 
 def _out_text_quote(ref, zettel_id):
     """
@@ -327,6 +328,18 @@ def parse_zettel(z_item, zettel_id):
             insert_sequence.append(link)
             left_chunk = rx_dict["add_ref"].sub("", left_chunk)
 
+        elif (key == 'link') or (options['link-all'] and (key == 'cross_ref')):
+            link = match.group('id')
+            if (link in z_map) and (z_map[link]["type"] in ['quote', 'left_text', 'right_text']):
+                left_chunk = rx_dict["link"].sub(_out_quoteref(z_map[link]["ref"], link), left_chunk) 
+            elif (z_item["type"] not in [ "citation" ]) and ((z_item["type"] == "index") or (options["only-link-from-index"] is not True)):
+	            if (link not in z_map) and (z_item["type"] not in [ "index", "sequential" ]):
+	            	unindexed_links.append(link)
+	            _z_add_to_stack(link, "body")
+	            left_chunk = rx_dict[key].sub(_out_link(z_map[link]["ref"], link), left_chunk)
+    	    else:
+    	    	left_chunk = rx_dict[key].sub(_out_commented_id(link), left_chunk)
+
         elif key in [ 'cross_ref', 'cross_ref_alt' ]:
             link = match.group('id')
             left_chunk = rx_dict[key].sub(_out_commented_id(link, pre=STR_SIGN_COMMENT), left_chunk)
@@ -339,17 +352,7 @@ def parse_zettel(z_item, zettel_id):
             fn_id = match.group('fn_id')
             left_chunk = rx_dict['footnote'].sub("[^fn-" + zettel_id + "-" + fn_id + "]", left_chunk)
 
-        elif key == 'link':
-            link = match.group('id')
-            if (link in z_map) and (z_map[link]["type"] in ['quote', 'left_text', 'right_text']):
-                left_chunk = rx_dict["link"].sub(_out_quoteref(z_map[link]["ref"], link), left_chunk) 
-       	    elif (z_item["type"] not in [ "citation" ]) and ((z_item["type"] == "index") or (options["only-link-from-index"] is not True)):
-	            if (link not in z_map) and (z_item["type"] not in [ "index", "sequential" ]):
-	            	unindexed_links.append(link)
-	            _z_add_to_stack(link, "body")
-	            left_chunk = rx_dict["link"].sub(_out_link(z_map[link]["ref"], link), left_chunk)
-    	    else:
-    	    	left_chunk = rx_dict["link"].sub(_out_commented_id(link), left_chunk)
+
 
        	return left_chunk + parse_chunk(chunk[end:])
 
@@ -525,7 +528,7 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:P', [ 'no-commented-references', 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index', 'no-separator'])
+useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:PL', [ 'no-commented-references', 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index', 'no-separator', 'link-all'])
 
 _initialize_stack()
 
@@ -564,6 +567,8 @@ for opt, arg in useroptions:
 	elif opt in ('-P'):
 		options['parallel-texts-processor'] = True
 		options['no-commented-references'] = True
+	elif opt in ('-L', '--link-all'):
+		options['link-all'] = True
 
 
 index_filename = infile[0]
