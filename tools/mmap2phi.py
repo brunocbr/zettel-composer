@@ -70,11 +70,16 @@ def readFile(infile):
 	with open(infile, 'r') as file_obj:
 		lines = file_obj.read().splitlines()
 
-	match = title_rx.search(lines[0])
-	if not match:
-		raise Exception("Invalid file name for note detected in the first line")
+	if not title_basename:
+		match = title_rx.search(lines[0])
+		if not match:
+			raise Exception("Invalid file name for note detected in the first line")
+	else:
+		match = title_rx.search(title_basename)
+
 	phi_id = match.group('id')
 	title = match.group('title')
+
 	out_filename = phi_dir + '/' + phi_id + ' ' + title + '.markdown'
 	data.append('# ' + title)
 
@@ -100,8 +105,9 @@ infile = sys.argv[2]
 mindnode_path = sys.argv[3]
 title_basename = os.path.splitext(os.path.basename(infile))[0]
 
-# match = title_rx.search(title_basename)
-# if not match:
+match = title_rx.search(title_basename)
+if not match:
+	title_basename = None
 #	raise Exception("Invalid file name for note detected in the first line")
 
 d = readFile(infile)
