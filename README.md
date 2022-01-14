@@ -24,9 +24,9 @@ Usually when working with "Zettelkasten" notes, you'll want to make cross refere
 This is a reference to § [[1234]].
 ```
 
-You can override the default behaviour with the `--link-all` option if you wan't to print notes referenced with "standard" wiki links.
+You can override the default behaviour with the `--link-all` option if you don't want to print notes referenced with "standard" wiki links.
 
-There's also a notation for references that necessarily will not be printed, even with the above option:
+There's also a notation for references that necessarily will not be printed, even with the above option. It consists in a wiki link at the very beginning of a line, followed by a colon:
 
 ```
 [[1234]]: This develops some thoughts from a cross-referenced note that should never be printed.
