@@ -95,7 +95,7 @@ But if you just want to insert the contents of the body of a  note[^1], without 
 | Parameter | Description                                 |
 | --------- | ----------                                  |
 | `-h`      | Handout mode (only quotes will be printed). |
-| `-h +`    | Also print section headings.                |
+| `-h+`     | Also print section headings.                |
 
 
 ### Parallel texts ###
@@ -123,7 +123,7 @@ Parallel texts are rendered in `LaTeX` (via `pandoc`), requiring a `\ParallelTex
 | `-G` *opt* | Choose which texts(s) to print. *opt* should be `l`,  `r` or `lr` (default). |
 
 
-[^1]: I speak of the "body" of a note because the script will recognize a YAML frontmatter and discard it.
+
 ### Pandoc citations ###
 
 Notes may have bibliographical metadata in their frontmatter:
@@ -136,6 +136,49 @@ loc:		12-45
 ```
 
 This information can be used elsewhere, creating  pandoc-style citations by making a refence to the notes with `@ [[1234]]` (parenthetical citation), `-@ [[1234]]` (publication year), `@@ [[1233]]` (inline citation).
+
+
+## Use-Cases
+
+You can create a shell scripts with preconfigured parameters for the `Zettel Composer`, passing the `index` file name as an argument. The examples below will assume this setup.
+
+Tip: If you are on the mac, you may use scripts like these with the `Automator`, creating applications. You may then use those applications to open your `index` notes from your preferred editor (such as [The Archive](https://zettelkasten.de/the-archive/) or [nvAlt](https://brettterpstra.com/projects/nvalt/)).
+
+
+Case 1: given a structure note, browse all wiki linked notes in Marked. This is very useful e. g. with a structure note for the annotation of a book, containing links for the individual chapter/section notes.
+
+```sh
+open -a "Marked 2"
+
+$HOME/GitHub/zettel-composer/zettel-compose.py -L --stream-to-marked "${1}"
+```
+
+Case 2: Generate a handout, while at the same time having a live preview:
+
+```
+open -a "Marked 2"
+
+pkill -f zettel-compose.py
+$HOME/GitHub/zettel-composer/zettel-compose.py -W -h+ -P -O "$HOME/Downloads/Handout.md" "${1}" &
+$HOME/GitHub/zettel-composer/zettel-compose.py -W --stream-to-marked -h+ "${1}"
+```
+
+You can use `Handout.md` as input for some other process, like converting it to PDF with `LaTeX` and `pandoc`.
+
+Case 3: Compose a book consisting of many chapters distributed in different notes, but don't print the index itself. The output will be later processed with `LaTeX`, which will take care of creating a table of contents:
+
+```
+OUT=$HOME/Documents/My-Book.md
+$HOME/GitHub/zettel-composer/zettel-compose.py -S -I -O "${OUT}" "${1}"
+```
+
+
+
+
+
+
+
+[^1]: I speak of the "body" of a note because the script will recognize a YAML frontmatter and discard it.
 
 
 [^2]: The script doesn't currently support forwarding linking.
