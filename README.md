@@ -8,7 +8,7 @@ The "index". Linked notes: public and private. The `§` symbol.
 
 | Parameter                  | Description                          |
 | ----------                 | ----------                           |
-| '-S', '--suppress-index'   | Do not print the index note.         |
+| `-S`, `--suppress-index`        | Do not print the index note.         |
 | `-W`, `--watch`            | Don't quit, watch files for changes. |
 | `-M`, `--stream-to-marked` | Stream to Marked 2.                  |
 | `-O`, `--output=`          |                                      |
