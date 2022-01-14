@@ -145,7 +145,7 @@ You can create a shell scripts with preconfigured parameters for the `Zettel Com
 Tip: If you are on the mac, you may use scripts like these with the `Automator`, creating applications. You may then use those applications to open your `index` notes from your preferred editor (such as [The Archive](https://zettelkasten.de/the-archive/) or [nvAlt](https://brettterpstra.com/projects/nvalt/)).
 
 
-Case 1: given a structure note, browse all wiki linked notes in Marked. This is very useful e. g. with a structure related to annotations of a book, containing links for the individual chapter/section notes.
+Case 1: given a structure note, browse all wiki linked notes in Marked. This is very useful e. g. with a structure note related to annotations of a book, containing links for the individual chapter/section notes.
 
 ```bash
 #!/bin/bash
