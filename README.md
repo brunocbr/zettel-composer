@@ -155,7 +155,7 @@ $HOME/GitHub/zettel-composer/zettel-compose.py -L --stream-to-marked "${1}"
 
 Case 2: Generate a handout, while at the same time having a live preview:
 
-```bashell
+```bash
 open -a "Marked 2"
 pkill -f zettel-compose.py
 $HOME/GitHub/zettel-composer/zettel-compose.py -W -h+ -P -O "$HOME/Downloads/Handout.md" "${1}" &
