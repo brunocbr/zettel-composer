@@ -1,31 +1,62 @@
 # Zettel Composer
 
-A tool for combining notes.
-
-The "index". Linked notes: public and private. The `§` symbol. 
+This is a tool for combining notes in a "Zettelkasten" system.
 
 ## Basic features
 
-| Parameter                  | Description                          |
-| ----------                 | ----------                           |
-| `-S`, `--suppress-index`        | Do not print the index note.         |
-| `-W`, `--watch`            | Don't quit, watch files for changes. |
-| `-M`, `--stream-to-marked` | Stream to Marked 2.                  |
-| `-O`, `--output=`          |                                      |
-| `-v`                       | Verbose mode.                        |
+The script takes as its argument the name of a file which will be used as an `index` note. Wiki links (`[[1234]]`) in the index will produce the combination of the specified files in the output:
+
+```sh
+./zettel-compose.py "~/archive/2345 My index note.markdown"
+```
+
+With the above command, the script will simply print the combined notes and quit. You can get a live preview using [Marked 2](https://marked2app.com/) and telling the script to keep watching the files for changes:
+
+```sh
+./zettel-compose.py --watch --stream-to-marked "~/archive/2345 My index note.markdown"
+```
+
+The "index" note will control the order in which notes will be printed. It is recommended that you include all the relevant notes in the index (but the script will also include others as it finds references while scanning the notes, under certain conditions).
+
+Usually when working with "Zettelkasten" notes, you'll want to make cross references to notes not necessarily intended for "public" consumption. This is why the default behaviour is to only reference and print the contents linked in children notes using a non-standard notation of wiki links prefixed by a paragraph mark:
+
+```
+This is a reference to § [[1234]].
+```
+
+There's also a notation for references that necessarily will never be printed:
+
+```
+[[1234]]: This is an elaboration from a cross-referenced note that should not be printed.
+```
+
+Other notations may be used for working with quoting text passages and pandoc citations extracted from bibliographical metadata (see below).
+
+By default, the script will threat every separate note as a "paragraph" (that can also be back-referenced) and number them sequentially (`1.`, `2.`, `3.`). Markdown headings in the beginning of the notes will be accomodated before paragraph numbers, so that you can, e. g., break the output in different chapters.
 
 
-## Some tweaks
+### Basic parameters
 
-| Parameter                               | Description                                  |
-| ----------                              | ----------                                   |
-| `--link-all` or `-L`                    |                                              |
-| `-I`                                    | Only link from the index note. (deprecated?) |
-| `'-H`, `--heading-identifier=` *string* |                                              |
-| `-s`, `--sleep-time=`                   |                                              |
-| `-n`, `--no-paragraph-headings`         |                                              |
-| `--no-separator`                        |                                              |
-| `-C`, `--no-commented-references`       |                                              |
+| Parameter                     | Description                          |
+| ----------                    | ----------                           |
+| `-S`, `--suppress-index`      | Do not print the index note.         |
+| `-W`, `--watch`               | Don't quit, watch files for changes. |
+| `-M`, `--stream-to-marked`    | Stream to Marked 2.                  |
+| `-O`, `--output=` *file name* | Specify *file name* as the output.    |
+| `-v`                          | Verbose mode.                        |
+
+
+### Some tweaks
+
+| Parameter                               | Description                                                                         |
+| ----------                              | ----------                                                                          |
+| `--link-all` or `-L`                    | Link and print all wiki linked notes, even if not prefixed by `§`.                   |
+| `-I`                                    | Only include notes linked from the index note. References in children notes will not be printed.
+| `'-H`, `--heading-identifier=` *string* |                                                                                     |
+| `-s`, `--sleep-time=` *seconds*         | How long to "sleep" between check cycles when watching files. Default is 2 seconds. |
+| `-n`, `--no-paragraph-headings`         | Do not print paragraph headings (`1.`, `2.`, `3.` etc.)                             |
+| `--no-separator`                        | Do not separate notes in the output with an horizontal bar.                         |
+| `-C`, `--no-commented-references`       |                                                                                     |
 
 
 ## Advanced features
