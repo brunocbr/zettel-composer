@@ -56,7 +56,7 @@ Markdown headings in the beginning of the notes will be accomodated before the p
 | `--link-all` or `-L`                    | Link and print all wiki linked notes, even if not prefixed by `§`.                                                   |
 | `-n`, `--no-paragraph-headings`         | Do not print paragraph headings (`1.`, `2.`, `3.` etc.)                                                              |
 | `--no-separator`                        | Do not separate notes in the output with a horizontal bar.                                                           |
-| `-I`                                    | Only include notes linked from the `index` note. References found in children notes will not be printed.             |
+| `-I`                                    | Only ionclude notes linked from the `index` note. References found in children notes will not be printed.            |
 | `--custom-url=` *string*                | A custom URL prepended to IDs in order to create links inside the CriticMarkup comments. Default: `thearchive://match/`. |
 | `-C`, `--no-commented-references`       | Disable CriticMarkup comments.                                                                                       |
 | `-s`, `--sleep-time=` *seconds*         | How long to "sleep" between file watching cycles. Default is 2 seconds.                                              |
@@ -98,6 +98,7 @@ But if you just want to insert the contents of the body of a  note[^1], without 
 | `-h+`     | Also print section headings.                |
 
 
+
 ### Parallel texts ###
 
 Bilingual handouts can be created by inserting "left" and "right" parallel texts:
@@ -106,9 +107,9 @@ Bilingual handouts can be created by inserting "left" and "right" parallel texts
 > [[1235]] :: [[1236]]
 ```
 
-When not in handout mode, the "left" text will be printed first, followed by the "right" text (unless this behaviour is modified by `-G`).
+The "left" text will be printed first, followed by the "right" text (unless this behaviour is modified by `-G`).
 
-Parallel texts are rendered in `LaTeX` (via `pandoc`), requiring a `\ParallelTexts` macro that you should define in your pandoc template (making use of `reledpar` or other package). 
+In handout mode with `-P`, parallel texts are rendered in `LaTeX` (via `pandoc`), requiring a `\ParallelTexts` macro that you should define in your pandoc template (making use of `reledpar` or other package). 
 
 ```latex
 \ParallelTexts{%
@@ -118,10 +119,10 @@ Parallel texts are rendered in `LaTeX` (via `pandoc`), requiring a `\ParallelTex
 }
 ```
 
-| Parameter  | Description                                                  |
-| ---------  | ----------                                                   |
+| Parameter  | Description                                                                  |
+| ---------  | ----------                                                                   |
 | `-G` *opt* | Choose which texts(s) to print. *opt* should be `l`,  `r` or `lr` (default). |
-
+| `-P`       | Render parallel texts in LaTeX.                                              |
 
 
 ### Pandoc citations ###
