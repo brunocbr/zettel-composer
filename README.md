@@ -59,7 +59,7 @@ Markdown headings in the beginning of the notes will be accomodated before the p
 | `--custom-url=` *string*                | A custom URL prepended to IDs in order to create links inside the CriticMarkup comments. Default: `thearchive://match/`. |
 | `-C`, `--no-commented-references`       | Disable CriticMarkup comments.                                                                                       |
 | `-s`, `--sleep-time=` *seconds*         | How long to "sleep" between file watching cycles. Default is 2 seconds.                                              |
-| `-I`                                    | Only include notes linked from the `index` note. References in children notes will not be printed. (deprecated)      |
+| `-I`                                    | Only include notes linked from the `index` note. References found in children notes will not be printed.             |
 | `-H`, `--heading-identifier=` *string*  |                                                                                                                      |
 
 
@@ -168,13 +168,8 @@ Case 3: Compose a book consisting of many chapters distributed in different note
 
 ```bash
 OUT=$HOME/Documents/My-Book.md
-$HOME/GitHub/zettel-composer/zettel-compose.py -S -I -O "${OUT}" "${1}"
+$HOME/GitHub/zettel-composer/zettel-compose.py -S -I -n -O "${OUT}" "${1}"
 ```
-
-
-
-
-
 
 
 [^1]: I speak of the "body" of a note because the script will recognize a YAML frontmatter and discard it.
