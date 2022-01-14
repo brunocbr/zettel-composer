@@ -1,6 +1,6 @@
 # Zettel Composer
 
-This is a tool for combining notes in a "Zettelkasten" system based on Markdown and wiki links.
+A tool for combining notes in a "Zettelkasten" system based on Markdown and wiki links.
 
 ## Basic features
 
