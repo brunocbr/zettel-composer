@@ -18,16 +18,16 @@ With the above command, the script will simply print the combined notes and quit
 
 The `index` note will control the order in which notes will be printed. It is recommended that you include all the relevant notes in the index (but the script will also include others as it finds references while scanning the notes, under certain conditions).
 
-Usually when working with "Zettelkasten" notes, you'll want to make cross references to notes not necessarily intended for "public" consumption. This is why the default behaviour is to only reference and print the contents linked in children notes using a non-standard notation of wiki links prefixed by the section mark (it can usually be typed with `⌥ 6` on the mac, `C-x 8 S` in emacs):
+Usually when working with "Zettelkasten" notes, you'll want to make cross references to notes not necessarily intended for "public" consumption. This is why the default behaviour is to only reference and print the contents linked in children notes using a non-standard notation of wiki links prefixed by the section mark (this character can usually be typed with `⌥ 6` on the mac, `C-x 8 S` in emacs):
 
 ```
 This is a reference to § [[1234]].
 ```
 
-There's also a notation for references that necessarily will never be printed:
+There's also a notation for references that necessarily will not be printed:
 
 ```
-[[1234]]: This develops some thoughts from a cross-referenced note that should not be printed.
+[[1234]]: This develops some thoughts from a cross-referenced note that should never be printed.
 ```
 
 Other notations are available for working with quoting text passages and pandoc citations (see below).
@@ -40,7 +40,7 @@ Markdown headings in the beginning of the notes will be accomodated before the p
 
 | Parameter                     | Description                          |
 | ----------                    | ----------                           |
-| `-S`, `--suppress-index`      | Do not print the index note.         |
+| `-S`, `--suppress-index`      | Do not print the `index` note.       |
 | `-W`, `--watch`               | Don't quit, watch files for changes. |
 | `-M`, `--stream-to-marked`    | Stream to Marked 2.                  |
 | `-O`, `--output=` *file name* | Specify *file name* as the output.   |
@@ -52,34 +52,21 @@ Markdown headings in the beginning of the notes will be accomodated before the p
 | Parameter                               | Description                                                                                                          |
 | ----------                              | ----------                                                                                                           |
 | `--link-all` or `-L`                    | Link and print all wiki linked notes, even if not prefixed by `§`.                                                   |
-| `-I`                                    | Only include notes linked from the index note. References in children notes will not be printed.                     |
+| `-I`                                    | Only include notes linked from the `index` note. References in children notes will not be printed. (deprecated)      |
 | `'-H`, `--heading-identifier=` *string* |                                                                                                                      |
-| `-s`, `--sleep-time=` *seconds*         | How long to "sleep" between check cycles when watching files. Default is 2 seconds.                                  |
+| `-s`, `--sleep-time=` *seconds*         | How long to "sleep" between file watching cycles. Default is 2 seconds.                                              |
 | `-n`, `--no-paragraph-headings`         | Do not print paragraph headings (`1.`, `2.`, `3.` etc.)                                                              |
-| `--no-separator`                        | Do not separate notes in the output with an horizontal bar.                                                          |
-| `--custom-url=` *string*                | A custom URL prepended to IDs in order to create links inside CriticMarkup comments. Default: `thearchive://match/`. |
+| `--no-separator`                        | Do not separate notes in the output with a horizontal bar.                                                           |
+| `--custom-url=` *string*                | A custom URL prepended to IDs in order to create links inside the CriticMarkup comments. Default: `thearchive://match/`. |
 | `-C`, `--no-commented-references`       | Disable CriticMarkup comments.                                                                                       |
 
 
 
 ## Advanced features
-
-### Pandoc citations ###
-
-Notes may have bibliographical metadata in their frontmatter:
-
-```
-citekey:	Author1999
-loc:		12-45
-```
-
-This information can be used elsewhere, creating  pandoc-style citations by making a refence to the notes with `@ [[1234]]` (parenthetical citation), `-@ [[1234]]` (publication year), `@@ [[1233]]` (inline citation).
-
-
 ### Quotes and text fragments ###
 
 
-You may create a note (`1235`) containing but a quote or fragment of text. You can then quote its actual contents in another note with this:
+You may create a note (`1235` in this example) containing but a quote or fragment of text. You can then quote its actual contents inside another note with this:
 
 ```
 > [[1235]]
@@ -87,13 +74,32 @@ You may create a note (`1235`) containing but a quote or fragment of text. You c
 
 The quote will receive a sequential numerical identification (`T1`, `T2`, `T3` etc.) and may be later referenced (wiki links will be transformed in `T1`, `T2`, `T3` etc.).
 
-This is very useful if you do translations, as you may elaborate work with them in notes separated from the text where they are to be included (e. g. a paper, lecture notes). You can also create handouts from the very same note (see below).
+This is very useful if you do translations, as you may work with them in notes separated from the text where they are to be included (e. g. a paper, lecture notes). You can also create handouts from the very same note (see below).
+
+But if you just want to insert the contents of the body of a  note[^1], without any special handling, you can use the following:
+
+```
++ [[1235]]
+```
 
 
-| Parameter      | Description                  |
-| ----------     | ----------                   |
-| `-t` *integer* | Set the initial text number. |
+| Parameter  | Description                         |
+| ---------- | ----------                          |
+| `-t` *n*   | Set the initial text number (`Tn`). |
 
+
+### Pandoc citations ###
+
+Notes may have bibliographical metadata in their frontmatter:
+
+```
+---
+citekey:	Author1999
+loc:		12-45
+...
+```
+
+This information can be used elsewhere, creating  pandoc-style citations by making a refence to the notes with `@ [[1234]]` (parenthetical citation), `-@ [[1234]]` (publication year), `@@ [[1233]]` (inline citation).
 
 
 ### Handouts ###
@@ -129,3 +135,4 @@ Parallel texts are created as a `LaTeX` output, requiring a `\ParallelTexts` mac
 | `-G` *opt* | Choose which texts(s) to print. *opt* should be `l`,  `r` or `lr` (default). |
 
 
+[^1]: I speak of the "body" of a note because the script will recognize a YAML frontmatter and discard it.
