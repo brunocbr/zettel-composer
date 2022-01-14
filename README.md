@@ -16,7 +16,7 @@ With the above command, the script will simply print the combined notes and quit
 ./zettel-compose.py --watch --stream-to-marked "~/archive/2345 My index note.markdown"
 ```
 
-The `index` note will control the order in which notes will be printed. It is recommended that you include all the relevant notes in the index (but the script will also include others as it finds references while scanning the notes, under certain conditions).
+The `index` note will control the order in which notes will be printed. It is recommended that you include all the relevant notes in the index (but the script will also include others as it finds references while scanning the notes).
 
 Usually when working with "Zettelkasten" notes, you'll want to make cross references to notes not necessarily intended for "public" consumption. This is why the default behaviour is to only reference and print notes using a non-standard notation of wiki links prefixed by the section mark (this character can usually be typed with `⌥ 6` on the mac, `C-x 8 S` in emacs):
 
@@ -24,7 +24,9 @@ Usually when working with "Zettelkasten" notes, you'll want to make cross refere
 This is a reference to § [[1234]].
 ```
 
-There's also a notation for references that necessarily will not be printed:
+You can override the default behaviour with the `--link-all` option if you wan't to print notes referenced with "standard" wiki links.
+
+There's also a notation for references that necessarily will not be printed, even with the above option:
 
 ```
 [[1234]]: This develops some thoughts from a cross-referenced note that should never be printed.
@@ -32,9 +34,9 @@ There's also a notation for references that necessarily will not be printed:
 
 Other special notations are available for working with quotes and pandoc citations (see below).
 
-By default, the script will threat every separate note as a "section" or "paragraph" and number them sequentially (`1.`, `2.`, `3.`). They can always be cross referenced with the `§ [[1234]]`notation (which yields `(§1)`, `(§2)`, `(§3)` etc. in the output).
+By default, the script will threat every separate note as a "section" or "paragraph" and number them sequentially (`1.`, `2.`, `3.`). They can always be cross referenced with the `§ [[1234]]` notation (which yields `(§1)`, `(§2)`, `(§3)` etc. in the output).
 
-Markdown headings in the beginning of the notes will be accomodated before the paragraph numbers, so that you can, e. g., break the output in different chapters and sections.
+Markdown headings in the beginning of the notes will be accomodated before the paragraph numbers, so that you can, e. g., break the output in different chapters and sections. You can also suppress paragraph headings with `-n`.
 
 ### Basic parameters
 
