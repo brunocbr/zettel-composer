@@ -36,7 +36,7 @@ Other special notations are available for working with quotes and pandoc citatio
 
 By default, the script will threat every separate note as a "section" or "paragraph" and number them sequentially (`1.`, `2.`, `3.`). They can always be cross referenced with the `§ [[1234]]` notation (which yields `(§1)`, `(§2)`, `(§3)` etc. in the output).
 
-Markdown headings in the beginning of the notes will be accomodated before the paragraph numbers, so that you can, e. g., break the output in different chapters and sections. You can also suppress paragraph headings with `-n`.
+Markdown headings in the beginning of the notes will be accomodated before the paragraph numbers, so that you can, e. g., break the output in different chapters and sections. You can also suppress paragraph headings by calling the script with the `-n` option.
 
 ### Basic parameters
 
@@ -95,12 +95,12 @@ But if you just want to insert the contents of the body of a  note[^1], without 
 | Parameter | Description                                 |
 | --------- | ----------                                  |
 | `-h`      | Handout mode (only quotes will be printed). |
-| `-h+`     | Also print section headings.                |
+| `-h +`    | Also print section headings.                |
 
 
 ### Parallel texts ###
 
-Bilingual handouts can be created by quoting "left" and "right" parallel texts:
+Bilingual handouts can be created by inserting "left" and "right" parallel texts:
 
 ```
 > [[1235]] :: [[1236]]
@@ -108,7 +108,7 @@ Bilingual handouts can be created by quoting "left" and "right" parallel texts:
 
 When not in handout mode, the "left" text will be printed first, followed by the "right" text (unless this behaviour is modified by `-G`).
 
-Parallel texts are created as a `LaTeX` output, requiring a `\ParallelTexts` macro you should define in your pandoc template (making use of `reledpar` or other package). 
+Parallel texts are rendered in `LaTeX` output (via `pandoc`), requiring a `\ParallelTexts` macro you should define in your pandoc template (making use of `reledpar` or other package). 
 
 ```latex
 \ParallelTexts{%
