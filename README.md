@@ -39,7 +39,7 @@ citekey:	Author1999
 loc:		12-45
 ```
 
-This information can be used in elsewhere, creating  pandoc-style citations by making a refence to the notes with `@ [[1234]]` (parenthetical citation), `-@ [[1234]]` (publication year), `@@ [[1233]]` (inline citation).
+This information can be used elsewhere, creating  pandoc-style citations by making a refence to the notes with `@ [[1234]]` (parenthetical citation), `-@ [[1234]]` (publication year), `@@ [[1233]]` (inline citation).
 
 
 ### Quotes and text fragments ###
@@ -51,7 +51,7 @@ You may create a note (`1235`) containing but a quote or fragment of text. You c
 > [[1235]]
 ```
 
-The quote will receive a sequential numbering (`T1`, `T2`, `T3` etc.) and may be later referenced (wiki links will be transformed in `T1`, `T2`, `T3` etc.).
+The quote will receive a sequential numerical identification (`T1`, `T2`, `T3` etc.) and may be later referenced (wiki links will be transformed in `T1`, `T2`, `T3` etc.).
 
 This is very useful if you work translations, as you may elaborate and review quotes or fragments in notes separated from the text where they are to be included (e. g. a paper, lecture notes). You can also create handouts from the very same note (see below).
 
@@ -70,9 +70,18 @@ This is very useful if you work translations, as you may elaborate and review qu
 | `-h+`     | Also print section headings.                |
 
 
-### Paralell texts ###
+### Parallel texts ###
 
-| Parameter  | Description                  |
-| ---------  | ----------                   |
-| `-G` *opt* | *opt* should be `l` or  `r`. |
+Bilingual handouts can be created by quoting "left" and "right" parallel texts:
+
+```
+> [[1235]] :: [[1236]]
+```
+
+When not in handout mode, the "left" text will be printed first, followed by the "right" text (unless this behaviour is modified by `-G`).
+
+| Parameter  | Description                                                  |
+| ---------  | ----------                                                   |
+| `-G` *opt* | Choose which texts(s) to print. *opt* should be `l`,  `r` or `lr` (default). |
+
 
