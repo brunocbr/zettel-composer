@@ -56,10 +56,10 @@ Markdown headings in the beginning of the notes will be accomodated before the p
 | `--link-all` or `-L`                    | Link and print all wiki linked notes, even if not prefixed by `§`.                                                   |
 | `-n`, `--no-paragraph-headings`         | Do not print paragraph headings (`1.`, `2.`, `3.` etc.)                                                              |
 | `--no-separator`                        | Do not separate notes in the output with a horizontal bar.                                                           |
+| `-I`                                    | Only include notes linked from the `index` note. References found in children notes will not be printed.             |
 | `--custom-url=` *string*                | A custom URL prepended to IDs in order to create links inside the CriticMarkup comments. Default: `thearchive://match/`. |
 | `-C`, `--no-commented-references`       | Disable CriticMarkup comments.                                                                                       |
 | `-s`, `--sleep-time=` *seconds*         | How long to "sleep" between file watching cycles. Default is 2 seconds.                                              |
-| `-I`                                    | Only include notes linked from the `index` note. References found in children notes will not be printed.             |
 | `-H`, `--heading-identifier=` *string*  |                                                                                                                      |
 
 
