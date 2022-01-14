@@ -1,6 +1,6 @@
 # Zettel Composer
 
-This is a tool for combining notes in a "Zettelkasten" system.
+This is a tool for combining notes in a "Zettelkasten" system based on Markdown and wiki links.
 
 ## Basic features
 
@@ -54,12 +54,12 @@ Markdown headings in the beginning of the notes will be accomodated before the p
 | Parameter                               | Description                                                                                                          |
 | ----------                              | ----------                                                                                                           |
 | `--link-all` or `-L`                    | Link and print all wiki linked notes, even if not prefixed by `§`.                                                   |
-| `-I`                                    | Only include notes linked from the `index` note. References in children notes will not be printed. (deprecated)      |
 | `-n`, `--no-paragraph-headings`         | Do not print paragraph headings (`1.`, `2.`, `3.` etc.)                                                              |
 | `--no-separator`                        | Do not separate notes in the output with a horizontal bar.                                                           |
 | `--custom-url=` *string*                | A custom URL prepended to IDs in order to create links inside the CriticMarkup comments. Default: `thearchive://match/`. |
 | `-C`, `--no-commented-references`       | Disable CriticMarkup comments.                                                                                       |
 | `-s`, `--sleep-time=` *seconds*         | How long to "sleep" between file watching cycles. Default is 2 seconds.                                              |
+| `-I`                                    | Only include notes linked from the `index` note. References in children notes will not be printed. (deprecated)      |
 | `-H`, `--heading-identifier=` *string*  |                                                                                                                      |
 
 
@@ -108,7 +108,7 @@ Bilingual handouts can be created by inserting "left" and "right" parallel texts
 
 When not in handout mode, the "left" text will be printed first, followed by the "right" text (unless this behaviour is modified by `-G`).
 
-Parallel texts are rendered in `LaTeX` (via `pandoc`), requiring a `\ParallelTexts` macro you should define in your pandoc template (making use of `reledpar` or other package). 
+Parallel texts are rendered in `LaTeX` (via `pandoc`), requiring a `\ParallelTexts` macro that you should define in your pandoc template (making use of `reledpar` or other package). 
 
 ```latex
 \ParallelTexts{%
