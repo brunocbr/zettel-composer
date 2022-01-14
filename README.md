@@ -39,7 +39,7 @@ citekey:	Author1999
 loc:		12-45
 ```
 
-These metadata may be transformed in pandoc-style citations with `@ [[1234]]` (parenthetical citation), `-@ [[1234]]` (publication year), `@@ [[1233]]` inline citation.
+This information can be used in elsewhere, creating  pandoc-style citations by making a refence to the notes with `@ [[1234]]` (parenthetical citation), `-@ [[1234]]` (publication year), `@@ [[1233]]` (inline citation).
 
 
 ### Quotes and text fragments ###
