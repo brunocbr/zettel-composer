@@ -42,21 +42,23 @@ By default, the script will threat every separate note as a "paragraph" (that ca
 | `-S`, `--suppress-index`      | Do not print the index note.         |
 | `-W`, `--watch`               | Don't quit, watch files for changes. |
 | `-M`, `--stream-to-marked`    | Stream to Marked 2.                  |
-| `-O`, `--output=` *file name* | Specify *file name* as the output.    |
+| `-O`, `--output=` *file name* | Specify *file name* as the output.   |
 | `-v`                          | Verbose mode.                        |
 
 
 ### Some tweaks
 
-| Parameter                               | Description                                                                         |
-| ----------                              | ----------                                                                          |
-| `--link-all` or `-L`                    | Link and print all wiki linked notes, even if not prefixed by `§`.                   |
-| `-I`                                    | Only include notes linked from the index note. References in children notes will not be printed.
-| `'-H`, `--heading-identifier=` *string* |                                                                                     |
-| `-s`, `--sleep-time=` *seconds*         | How long to "sleep" between check cycles when watching files. Default is 2 seconds. |
-| `-n`, `--no-paragraph-headings`         | Do not print paragraph headings (`1.`, `2.`, `3.` etc.)                             |
-| `--no-separator`                        | Do not separate notes in the output with an horizontal bar.                         |
-| `-C`, `--no-commented-references`       |                                                                                     |
+| Parameter                               | Description                                                                                                          |
+| ----------                              | ----------                                                                                                           |
+| `--link-all` or `-L`                    | Link and print all wiki linked notes, even if not prefixed by `§`.                                                   |
+| `-I`                                    | Only include notes linked from the index note. References in children notes will not be printed.                     |
+| `'-H`, `--heading-identifier=` *string* |                                                                                                                      |
+| `-s`, `--sleep-time=` *seconds*         | How long to "sleep" between check cycles when watching files. Default is 2 seconds.                                  |
+| `-n`, `--no-paragraph-headings`         | Do not print paragraph headings (`1.`, `2.`, `3.` etc.)                                                              |
+| `--no-separator`                        | Do not separate notes in the output with an horizontal bar.                                                          |
+| `--custom-url=` *string*                | A custom URL prepended to IDs in order to create links inside CriticMarkup comments. Default: `thearchive://match/`. |
+| `-C`, `--no-commented-references`       | Disable CriticMarkup comments.                                                                                       |
+
 
 
 ## Advanced features

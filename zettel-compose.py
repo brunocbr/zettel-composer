@@ -16,7 +16,6 @@ KEY_LOCATION = 'loc'
 
 CF_PANDOC ='/usr/local/bin/pandoc'
 
-STR_ZETTEL_URL = 'thearchive://match/'
 STR_UNINDEXED_HEADING = '# Unindexed'
 STR_STREAMING_ID = "<!--\nzettel-compose.py\n-->\n"
 STR_SIGN_INSERT = '▾ '	# = '▾ '
@@ -25,13 +24,14 @@ STR_HANDOUT_HEADING = '####'
 SEPARATOR = [ '\n', '-----', '\n' ]
 
 options = {
-	'no-commented-references': False,
-	"no-paragraph-headings": False,
-	"heading-identifier": "paragraph-",
-	"watch": False,
-	"sleep-time": 2,
 	"output": None,
-	"suppress-index": False,
+    'no-commented-references': False,
+    "no-paragraph-headings": False,
+    "heading-identifier": "paragraph-",
+    "watch": False,
+    "sleep-time": 2,
+    "output": None,
+    "suppress-index": False,
     "only-link-from-index": False,
     "verbose": False,
     "stream-to-marked": False,
@@ -40,7 +40,8 @@ options = {
     'no-separator': False,
     'handout-mode': False,
     'handout-with-sections': True,
-    'link-all': False # link normal wikilinks 
+    'link-all': False, # link normal wikilinks
+    'custom-url': 'thearchive://match/'
 }
 
 rx_dict = OrderedDict([
@@ -141,7 +142,7 @@ def _out_link(ref, id):
 			return " (§" + str(ref) + ")"
 
 def _out_linked_zettel(id):
-	return '[' + str(id) + '](' + STR_ZETTEL_URL + str(id) + ')'
+	return '[' + str(id) + '](' + options['custom-url'] + str(id) + ')'
 
 def _out_quoteref(ref, id):
     """
@@ -528,7 +529,9 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:PL', [ 'no-commented-references', 'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 'suppress-index', 'no-separator', 'link-all'])
+useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:PL', [ 'no-commented-references', 
+	'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 
+	'suppress-index', 'no-separator', 'link-all', 'custom-url='])
 
 _initialize_stack()
 
@@ -537,7 +540,7 @@ for opt, arg in useroptions:
 		options["output"] = arg
 	elif opt in ('-M', '--stream-to-marked'):
 		options["stream-to-marked"] = True
-	elif opt in ('-H', 'heading-identifier='):
+	elif opt in ('-H', '--heading-identifier='):
 		options["heading-identifier"] = arg
 	elif opt in ('-W', '--watch'):
 		options["watch"] = True
@@ -547,7 +550,7 @@ for opt, arg in useroptions:
 		options["no-paragraph-headings"] = True
 	elif opt in ('--no-separator'):
 		options["no-separator"] = True
-	elif opt in ('-C', 'no-commented-references'):
+	elif opt in ('-C', '--no-commented-references'):
 		options['no-commented-references'] = True
 	elif opt in ('-S', '--suppress-index'):
 		options["suppress-index"] = True
@@ -569,6 +572,8 @@ for opt, arg in useroptions:
 		options['no-commented-references'] = True
 	elif opt in ('-L', '--link-all'):
 		options['link-all'] = True
+	elif opt in ('--custom-url='):
+		options['custom-url'] = arg
 
 
 index_filename = infile[0]
