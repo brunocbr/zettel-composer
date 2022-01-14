@@ -44,6 +44,17 @@ This information can be used in elsewhere, creating  pandoc-style citations by m
 
 ### Quotes and text fragments ###
 
+A note may contain a single quote and then be included in the main text:
+
+```
+> [[1235]]
+```
+
+The quote will receive a sequential numbering (`T1`, `T2`, `T3` etc.) and may be later referenced (wiki links will be transformed in `T1`, `T2`, `T3` etc.).
+
+This is very useful if you work translations, as you may elaborate and review quotes or fragments in notes separated from the text where they are to be included (e. g. a paper, lecture notes). You can also create handouts from the very same note.
+
+
 | Parameter      | Description                  |
 | ----------     | ----------                   |
 | `-t` *integer* | Set the initial text number. |
