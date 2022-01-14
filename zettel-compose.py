@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 # zettel-compose.py
-# 	by Bruno L. Conte <bruno@brunoc.com.br>, 2020-2021
+# 	by Bruno L. Conte <bruno@brunoc.com.br>, 2020-2022
 
 import re
 from glob import glob
