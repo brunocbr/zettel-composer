@@ -4,7 +4,7 @@ This is a tool for combining notes in a "Zettelkasten" system.
 
 ## Basic features
 
-The script takes as its argument the name of a file which will be used as an `index` note. Wiki links (`[[1234]]`) in the index will produce the combination of the specified files in the output:
+The script takes as its argument the name of a file which will be used as an `index` note. Wiki links prepended with a section sign (`§ [[1234]]`) in the index will produce the combination of the specified files in the output:
 
 ```sh
 ./zettel-compose.py "~/archive/2345 My index note.markdown"
@@ -18,7 +18,7 @@ With the above command, the script will simply print the combined notes and quit
 
 The "index" note will control the order in which notes will be printed. It is recommended that you include all the relevant notes in the index (but the script will also include others as it finds references while scanning the notes, under certain conditions).
 
-Usually when working with "Zettelkasten" notes, you'll want to make cross references to notes not necessarily intended for "public" consumption. This is why the default behaviour is to only reference and print the contents linked in children notes using a non-standard notation of wiki links prefixed by a paragraph mark:
+Usually when working with "Zettelkasten" notes, you'll want to make cross references to notes not necessarily intended for "public" consumption. This is why the default behaviour is to only reference and print the contents linked in children notes using a non-standard notation of wiki links prefixed by a section mark (it can usually be type with `⌥6` on the mac, `C-x 8 s` in emacs):
 
 ```
 This is a reference to § [[1234]].
@@ -27,7 +27,7 @@ This is a reference to § [[1234]].
 There's also a notation for references that necessarily will never be printed:
 
 ```
-[[1234]]: This is an elaboration from a cross-referenced note that should not be printed.
+[[1234]]: This develops some thoughts from a cross-referenced note that should not be printed.
 ```
 
 Other notations may be used for working with quoting text passages and pandoc citations extracted from bibliographical metadata (see below).
