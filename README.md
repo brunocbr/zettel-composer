@@ -32,6 +32,16 @@ The "index". Linked notes: public and private. The `§` symbol.
 
 ### Pandoc citations ###
 
+Notes may have bibliographical metadata in their frontmatter:
+
+```
+citekey:	Author1999
+loc:		12-45
+```
+
+These metadata may be transformed in pandoc-style citations with `@ [[1234]]` (parenthetical citation), `-@ [[1234]]` (publication year), `@@ [[1233]]` inline citation.
+
+
 ### Quotes and text fragments ###
 
 | Parameter      | Description                  |
@@ -42,10 +52,10 @@ The "index". Linked notes: public and private. The `§` symbol.
 
 ### Handouts ###
 
-| Parameter | Description                            |
-| --------- | ----------                             |
-| `-h+`     | Print section headings in the handout. |
-| `-h`      | Handout mode (print only quotes).      |
+| Parameter | Description                                 |
+| --------- | ----------                                  |
+| `-h`      | Handout mode (only quotes will be printed). |
+| `-h+`     | Also print section headings.                |
 
 
 ### Paralell texts ###
