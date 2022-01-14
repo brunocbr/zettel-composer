@@ -14,7 +14,7 @@ import subprocess
 KEY_CITEKEY = 'citekey'
 KEY_LOCATION = 'loc'
 
-CF_PANDOC ='/usr/local/bin/pandoc'
+CF_PANDOC ='pandoc'
 
 STR_UNINDEXED_HEADING = '# Unindexed'
 STR_STREAMING_ID = "<!--\nzettel-compose.py\n-->\n"
@@ -24,7 +24,7 @@ STR_HANDOUT_HEADING = '####'
 SEPARATOR = [ '\n', '-----', '\n' ]
 
 options = {
-	"output": None,
+	'output': None,
     'no-commented-references': False,
     "no-paragraph-headings": False,
     "heading-identifier": "paragraph-",
@@ -53,7 +53,7 @@ rx_dict = OrderedDict([
 	('pandoc_cite', re.compile(r'@ *\[\[(?P<id>\d{3,})\]\]')),			#  @ [[dddd]]
 	('no_ref', re.compile(r'- *\[\[(?P<id>\d{3,})\]\]')),		   		#  - [[dddd]]		do not add note
 	('quote', re.compile(r' *>\s{0,1}\[\[(?P<id>\d{3,})\]\]')), 		#  > [[dddd]]		insert quote immediately
-	('add_ref', re.compile(r'\+\[\[(?P<id>\d{3,})\]\]')), 				#  + [[dddd]]		insert note immediately
+	('add_ref', re.compile(r'\+ *\[\[(?P<id>\d{3,})\]\]')), 				#  + [[dddd]]		insert note immediately
 	('link', re.compile(r'§ *\[\[(?P<id>\d{3,})\]\]')),					#  § [[dddd]]		print reference to paragraph or text
 	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\] *:')),   		#   [[dddd]] :		hidden cross reference
 	('cross_ref', re.compile(r'\s*\[\[(?P<id>\d{3,})\]\]')),			#   [[dddd]]		hidden cross reference
