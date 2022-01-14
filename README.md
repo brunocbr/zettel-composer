@@ -4,13 +4,13 @@ This is a tool for combining notes in a "Zettelkasten" system.
 
 ## Basic features
 
-The script takes as its argument the name of a file which will be used as an `index` note. Wiki links prepended with a section sign (`§ [[1234]]`) in the index will produce the combination of the specified files in the output:
+The script takes as its argument the name of a file which will be used as an `index` note. Wiki links prepended with a section sign (`§ [[1234]]`) in the index will produce the combination of the specified notes in the output:
 
 ```sh
 ./zettel-compose.py "~/archive/2345 My index note.markdown"
 ```
 
-With the above command, the script will simply print the combined notes and quit. You can get a live preview using [Marked 2](https://marked2app.com/) and telling the script to keep watching the files for changes:
+With the above command, the script will simply print the combined notes and quit. You can though get a live preview using [Marked 2](https://marked2app.com/) and telling the script to keep watching the files for changes:
 
 ```sh
 ./zettel-compose.py --watch --stream-to-marked "~/archive/2345 My index note.markdown"
@@ -18,7 +18,7 @@ With the above command, the script will simply print the combined notes and quit
 
 The `index` note will control the order in which notes will be printed. It is recommended that you include all the relevant notes in the index (but the script will also include others as it finds references while scanning the notes, under certain conditions).
 
-Usually when working with "Zettelkasten" notes, you'll want to make cross references to notes not necessarily intended for "public" consumption. This is why the default behaviour is to only reference and print the contents linked in children notes using a non-standard notation of wiki links prefixed by the section mark (this character can usually be typed with `⌥ 6` on the mac, `C-x 8 S` in emacs):
+Usually when working with "Zettelkasten" notes, you'll want to make cross references to notes not necessarily intended for "public" consumption. This is why the default behaviour is to only reference and print notes using a non-standard notation of wiki links prefixed by the section mark (this character can usually be typed with `⌥ 6` on the mac, `C-x 8 S` in emacs):
 
 ```
 This is a reference to § [[1234]].
@@ -30,11 +30,11 @@ There's also a notation for references that necessarily will not be printed:
 [[1234]]: This develops some thoughts from a cross-referenced note that should never be printed.
 ```
 
-Other notations are available for working with quoting text passages and pandoc citations (see below).
+Other special notations are available for working with quotes and pandoc citations (see below).
 
-By default, the script will threat every separate note as a "section" or "paragraph" and number them sequentially (`1.`, `2.`, `3.`). They can be cross referenced with the `§ [[1234]]`notation (which yields `(§1)`, `(§2)`, `(§3)` etc. in the output).
+By default, the script will threat every separate note as a "section" or "paragraph" and number them sequentially (`1.`, `2.`, `3.`). They can always be cross referenced with the `§ [[1234]]`notation (which yields `(§1)`, `(§2)`, `(§3)` etc. in the output).
 
-Markdown headings in the beginning of the notes will be accomodated before the paragraph numbers, so that you can, e. g., break the output in different chapters.
+Markdown headings in the beginning of the notes will be accomodated before the paragraph numbers, so that you can, e. g., break the output in different chapters and sections.
 
 ### Basic parameters
 
@@ -53,7 +53,7 @@ Markdown headings in the beginning of the notes will be accomodated before the p
 | ----------                              | ----------                                                                                                           |
 | `--link-all` or `-L`                    | Link and print all wiki linked notes, even if not prefixed by `§`.                                                   |
 | `-I`                                    | Only include notes linked from the `index` note. References in children notes will not be printed. (deprecated)      |
-| `'-H`, `--heading-identifier=` *string* |                                                                                                                      |
+| `-H`, `--heading-identifier=` *string*  |                                                                                                                      |
 | `-s`, `--sleep-time=` *seconds*         | How long to "sleep" between file watching cycles. Default is 2 seconds.                                              |
 | `-n`, `--no-paragraph-headings`         | Do not print paragraph headings (`1.`, `2.`, `3.` etc.)                                                              |
 | `--no-separator`                        | Do not separate notes in the output with a horizontal bar.                                                           |
@@ -66,7 +66,7 @@ Markdown headings in the beginning of the notes will be accomodated before the p
 ### Quotes and text fragments ###
 
 
-You may create a note (`1235` in this example) containing but a quote or fragment of text. You can then quote its actual contents inside another note with this:
+You may create a note (`1235` in this example) containing but a quote or fragment of text. You can then quote its actual contents inside another note in a line like this:
 
 ```
 > [[1235]]
