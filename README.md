@@ -53,7 +53,7 @@ You may create a note (`1235`) containing but a quote or fragment of text. You c
 
 The quote will receive a sequential numerical identification (`T1`, `T2`, `T3` etc.) and may be later referenced (wiki links will be transformed in `T1`, `T2`, `T3` etc.).
 
-This is very useful if you work translations, as you may elaborate and review quotes or fragments in notes separated from the text where they are to be included (e. g. a paper, lecture notes). You can also create handouts from the very same note (see below).
+This is very useful if you do translations, as you may elaborate work with them in notes separated from the text where they are to be included (e. g. a paper, lecture notes). You can also create handouts from the very same note (see below).
 
 
 | Parameter      | Description                  |
@@ -79,6 +79,16 @@ Bilingual handouts can be created by quoting "left" and "right" parallel texts:
 ```
 
 When not in handout mode, the "left" text will be printed first, followed by the "right" text (unless this behaviour is modified by `-G`).
+
+Parallel texts are created as a `LaTeX` output, requiring a `\ParallelTexts` macro you should define in your pandoc template (making use of `reledpar` or other package). 
+
+```latex
+\ParallelTexts{%
+... Left text ...
+}{%
+... Right text ...
+}
+```
 
 | Parameter  | Description                                                  |
 | ---------  | ----------                                                   |
