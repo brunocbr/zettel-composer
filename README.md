@@ -147,7 +147,7 @@ Tip: If you are on the mac, you may use scripts like these with the `Automator`,
 
 Case 1: given a structure note, browse all wiki linked notes in Marked. This is very useful e. g. with a structure note for the annotation of a book, containing links for the individual chapter/section notes.
 
-```sh
+```bash
 #!/bin/bash
 open -a "Marked 2"
 $HOME/GitHub/zettel-composer/zettel-compose.py -L --stream-to-marked "${1}"
@@ -155,7 +155,7 @@ $HOME/GitHub/zettel-composer/zettel-compose.py -L --stream-to-marked "${1}"
 
 Case 2: Generate a handout, while at the same time having a live preview:
 
-```sh
+```bashell
 open -a "Marked 2"
 pkill -f zettel-compose.py
 $HOME/GitHub/zettel-composer/zettel-compose.py -W -h+ -P -O "$HOME/Downloads/Handout.md" "${1}" &
@@ -166,7 +166,7 @@ You can use `Handout.md` as input for some other process, like converting it to 
 
 Case 3: Compose a book consisting of many chapters distributed in different notes, but don't print the index itself. The output will be later processed with `LaTeX`, which will take care of creating a table of contents:
 
-```sh
+```bash
 OUT=$HOME/Documents/My-Book.md
 $HOME/GitHub/zettel-composer/zettel-compose.py -S -I -O "${OUT}" "${1}"
 ```
