@@ -88,20 +88,6 @@ But if you just want to insert the contents of the body of a  note[^1], without 
 | `-t` *n*   | Set the initial text number (`Tn`). |
 
 
-### Pandoc citations ###
-
-Notes may have bibliographical metadata in their frontmatter:
-
-```
----
-citekey:	Author1999
-loc:		12-45
-...
-```
-
-This information can be used elsewhere, creating  pandoc-style citations by making a refence to the notes with `@ [[1234]]` (parenthetical citation), `-@ [[1234]]` (publication year), `@@ [[1233]]` (inline citation).
-
-
 ### Handouts ###
 
 | Parameter | Description                                 |
@@ -136,3 +122,17 @@ Parallel texts are created as a `LaTeX` output, requiring a `\ParallelTexts` mac
 
 
 [^1]: I speak of the "body" of a note because the script will recognize a YAML frontmatter and discard it.
+### Pandoc citations ###
+
+Notes may have bibliographical metadata in their frontmatter:
+
+```
+---
+citekey:	Author1999
+loc:		12-45
+...
+```
+
+This information can be used elsewhere, creating  pandoc-style citations by making a refence to the notes with `@ [[1234]]` (parenthetical citation), `-@ [[1234]]` (publication year), `@@ [[1233]]` (inline citation).
+
+
