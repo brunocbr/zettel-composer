@@ -12,7 +12,7 @@ cd ~/GitHub
 clone https://github.com/brunocbr/zettel-composer.git
 ```
 
-If you want to use Marked Streaming Preview, you have to install the Python ObjectiveC bridge:
+If you want to use Marked Streaming Preview, you have to install the Python Objective-C bridge:
 
 ```shell
 pip3 install -U pyobjc
