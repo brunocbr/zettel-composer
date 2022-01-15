@@ -101,15 +101,15 @@ But if you just want to insert the contents of the body of a  note[^1], without 
 
 ### Parallel texts ###
 
-Bilingual handouts can be created by inserting "left" and "right" parallel texts:
+Bilingual passages may be inserted by designating "left" and "right" texts:
 
 ```
 > [[1235]] :: [[1236]]
 ```
 
-The "left" text will be printed first, followed by the "right" text (unless this behaviour is modified by `-G`).
+In normal mode, the "left" text will be printed first, followed by the "right" text (unless this behaviour is modified by `-G`).
 
-In handout mode with `-P`, parallel texts are rendered in `LaTeX` (via `pandoc`), requiring a `\ParallelTexts` macro that you should define in your pandoc template (making use of `reledpar` or other package). 
+With option `-P`, parallel texts are rendered in `LaTeX` (via `pandoc`), the output requiring a `\ParallelTexts` macro that you should define in your pandoc template (making use of `reledpar` or other package). 
 
 ```latex
 \ParallelTexts{%
@@ -141,7 +141,7 @@ This information can be used elsewhere, creating  pandoc-style citations by maki
 
 ## Use-Cases
 
-You can create a shell scripts with preconfigured parameters for the `Zettel Composer`, passing the `index` file name as an argument. The examples below will assume this setup.
+You can create a shell script with preconfigured parameters for the `Zettel Composer`, passing the `index` file name as an argument. The examples below will assume this setup.
 
 Tip: If you are on the mac, you may use scripts like these with the `Automator`, creating applications. You may then use those applications to open your `index` notes from your preferred editor (such as [The Archive](https://zettelkasten.de/the-archive/) or [nvAlt](https://brettterpstra.com/projects/nvalt/)).
 
@@ -169,7 +169,7 @@ Case 3: Compose a book consisting of many chapters distributed in different note
 
 ```bash
 OUT=$HOME/Documents/My-Book.md
-$HOME/GitHub/zettel-composer/zettel-compose.py -S -I -n -O "${OUT}" "${1}"
+$HOME/GitHub/zettel-composer/zettel-compose.py -S -I -n --no-separator -O "${OUT}" "${1}"
 ```
 
 
