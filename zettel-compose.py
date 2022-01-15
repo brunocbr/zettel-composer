@@ -89,7 +89,7 @@ def _z_get_filepath(zettel_id):
 		    fn = glob(zettel_dir + "/" + zettel_id + "[ \.]*")[0]
 		mtime = os.path.getmtime(fn)
 	except:
-		print "ERROR: file not found for zettel " + zettel_id
+		print("ERROR: file not found for zettel " + zettel_id)
 		fn, mtime = None, None
 	return fn, mtime
 
@@ -578,7 +578,7 @@ for opt, arg in useroptions:
 
 index_filename = infile[0]
 if options["verbose"]:
-	print "Processing file " + infile[0]
+	print("Processing file " + infile[0])
 
 zettel_dir = os.path.dirname(index_filename)
 
@@ -586,5 +586,5 @@ parse_index(index_filename)
 
 if options["watch"]:
 	if options["verbose"]:
-		print "Will now watch for changes"
+		print("Will now watch for changes")
 	watch_folder()
