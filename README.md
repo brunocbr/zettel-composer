@@ -2,18 +2,34 @@
 
 A tool for combining notes in a "Zettelkasten" system based on Markdown and wiki links.
 
+## Installation
+
+Clone the project in a directory of your choosing (e. g. `~/GitHub`):
+
+```shell
+mkdir -p ~/GitHub
+cd ~/GitHub
+clone https://github.com/brunocbr/zettel-composer.git
+```
+
+If you want to use Marked Streaming Preview, you have to install the Python ObjectiveC bridge:
+
+```shell
+pip3 install -U pyobjc
+```
+
 ## Basic features
 
 The script takes as its argument the name of a file which will be used as an `index` note. Wiki links prepended with a section sign (`§ [[1234]]`) in the index will produce the combination of the specified notes in the output:
 
 ```sh
-./zettel-compose.py "~/archive/2345 My index note.markdown"
+~/GitHub/zettel-composer/zettel-compose.py "~/archive/2345 My index note.markdown"
 ```
 
 With the above command, the script will simply print the combined notes and quit. You can though get a live preview using [Marked 2](https://marked2app.com/) and telling the script to keep watching the files for changes:
 
 ```sh
-./zettel-compose.py --watch --stream-to-marked "~/archive/2345 My index note.markdown"
+~/GitHub/zettel-composer/zettel-compose.py --watch --stream-to-marked "~/archive/2345 My index note.markdown"
 ```
 
 The `index` note will control the order in which notes will be printed. It is recommended that you include all the relevant notes in the index, e. g. in an outline (but the script will also include others as it finds references while scanning the notes).
