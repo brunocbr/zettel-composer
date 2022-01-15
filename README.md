@@ -154,7 +154,7 @@ open -a "Marked 2"
 $HOME/GitHub/zettel-composer/zettel-compose.py -L --stream-to-marked "${1}"
 ```
 
-Case 2: Generate a handout, while at the same time having a live preview:
+Case 2: Continuously generate a handout, while at the same time having a live preview:
 
 ```bash
 open -a "Marked 2"
