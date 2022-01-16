@@ -25,23 +25,23 @@ SEPARATOR = [ '\n', '-----', '\n' ]
 
 options = {
 	'output': None,
-    'no-commented-references': False,
-    "no-paragraph-headings": False,
-    "heading-identifier": "paragraph-",
-    "watch": False,
-    "sleep-time": 2,
-    "output": None,
-    "suppress-index": False,
-    "only-link-from-index": False,
-    "verbose": False,
-    "stream-to-marked": False,
-    'parallel-texts-processor': None,
-    'parallel-texts-selection': 'lr',
-    'no-separator': False,
-    'handout-mode': False,
-    'handout-with-sections': True,
-    'link-all': False, # link normal wikilinks
-    'custom-url': 'thearchive://match/'
+	'no-commented-references': False,
+	"no-paragraph-headings": False,
+	"heading-identifier": "paragraph-",
+	"watch": False,
+	"sleep-time": 2,
+	"output": None,
+	"suppress-index": False,
+	"only-link-from-index": False,
+	"verbose": False,
+	"stream-to-marked": False,
+	'parallel-texts-processor': None,
+	'parallel-texts-selection': 'lr',
+	'no-separator': False,
+	'handout-mode': False,
+	'handout-with-sections': True,
+	'link-all': False, # link normal wikilinks
+	'custom-url': 'thearchive://match/'
 }
 
 rx_dict = OrderedDict([
@@ -86,7 +86,7 @@ def _z_get_filepath(zettel_id):
 		if (zettel_id == "index"):
 			fn = index_filename
 		else:
-		    fn = glob(zettel_dir + "/" + zettel_id + "[ \.]*")[0]
+			fn = glob(zettel_dir + "/" + zettel_id + "[ \.]*")[0]
 		mtime = os.path.getmtime(fn)
 	except:
 		print("ERROR: file not found for zettel " + zettel_id)
@@ -145,10 +145,10 @@ def _out_linked_zettel(id):
 	return '[' + str(id) + '](' + options['custom-url'] + str(id) + ')'
 
 def _out_quoteref(ref, id):
-    """
-    Formatted output for text reference
 	"""
-    return "T" + str(ref)
+	Formatted output for text reference
+	"""
+	return "T" + str(ref)
 
 def _out_paragraph_heading(ref, zettel_id):
 	"""
@@ -173,10 +173,10 @@ def _out_commented_id(zettel_id, pre = "", post=""):
 		return ' {>> ' + pre + _out_linked_zettel(zettel_id) + post + ' <<}'
 
 def _out_text_quote(ref, zettel_id):
-    """
-    Formatted output for quote preamble
-    """
-    return '> ' + _out_commented_id(zettel_id, pre=STR_SIGN_INSERT) + ' **T' + str(ref) + ':**  '
+	"""
+	Formatted output for quote preamble
+	"""
+	return '> ' + _out_commented_id(zettel_id, pre=STR_SIGN_INSERT) + ' **T' + str(ref) + ':**  '
 
 def _out_unindexed_notes():
 	output = [ STR_UNINDEXED_HEADING, "", ""]
@@ -281,118 +281,118 @@ def _pandoc_cite_noauthor(zettel_id):
 		return "[-@" + citetext + "]" + _out_commented_id(zettel_id, pre=STR_SIGN_COMMENT)
 
 def parse_zettel(z_item, zettel_id):
-    global options, z_map, unindexed_links
+	global options, z_map, unindexed_links
 
-    filepath = z_item["path"]
+	filepath = z_item["path"]
 
-    yaml_divert = False
-    got_content = False
-    insert_sequence = []
+	yaml_divert = False
+	got_content = False
+	insert_sequence = []
 
-    data = [] # create an empty list to collect the data
+	data = [] # create an empty list to collect the data
 
-    def parse_chunk(chunk):
-        key, match, end = _parse_line(chunk, rx_dict)
+	def parse_chunk(chunk):
+		key, match, end = _parse_line(chunk, rx_dict)
 
-        if (key is None):
-            return chunk
+		if (key is None):
+			return chunk
 
-        left_chunk = chunk[:end]
+		left_chunk = chunk[:end]
 
-        if key == 'quote':
-        	link = match.group('id')
-        	insert_quotes.append(link)
-        	left_chunk = rx_dict["quote"].sub("", left_chunk)
+		if key == 'quote':
+			link = match.group('id')
+			insert_quotes.append(link)
+			left_chunk = rx_dict["quote"].sub("", left_chunk)
 
-        elif key == 'parallel_texts':
-        	left_link, right_link = match.group('id_left'), match.group('id_right')
-        	insert_parallel_texts.append((left_link, right_link))
-        	left_chunk = rx_dict['parallel_texts'].sub("", left_chunk)
+		elif key == 'parallel_texts':
+			left_link, right_link = match.group('id_left'), match.group('id_right')
+			insert_parallel_texts.append((left_link, right_link))
+			left_chunk = rx_dict['parallel_texts'].sub("", left_chunk)
 
-        elif key == 'pandoc_cite':
-            link = match.group('id')
-            _z_add_to_stack(link, "citation")
-            left_chunk = rx_dict["pandoc_cite"].sub(_pandoc_cite(link), left_chunk)
+		elif key == 'pandoc_cite':
+			link = match.group('id')
+			_z_add_to_stack(link, "citation")
+			left_chunk = rx_dict["pandoc_cite"].sub(_pandoc_cite(link), left_chunk)
 
-        elif key == 'pandoc_cite_inline':
-            link = match.group('id')
-            _z_add_to_stack(link, "citation")
-            left_chunk = rx_dict["pandoc_cite_inline"].sub(_pandoc_cite(link, parenthetical = False), left_chunk)
+		elif key == 'pandoc_cite_inline':
+			link = match.group('id')
+			_z_add_to_stack(link, "citation")
+			left_chunk = rx_dict["pandoc_cite_inline"].sub(_pandoc_cite(link, parenthetical = False), left_chunk)
 
-        elif key == 'pandoc_cite_noauthor':
-            link = match.group('id')
-            _z_add_to_stack(link, "citation")            
-            left_chunk = rx_dict["pandoc_cite_noauthor"].sub(_pandoc_cite_noauthor(link), left_chunk)
+		elif key == 'pandoc_cite_noauthor':
+			link = match.group('id')
+			_z_add_to_stack(link, "citation")			
+			left_chunk = rx_dict["pandoc_cite_noauthor"].sub(_pandoc_cite_noauthor(link), left_chunk)
 
-        elif key == 'add_ref':
-            link = match.group('id')
-            insert_sequence.append(link)
-            left_chunk = rx_dict["add_ref"].sub("", left_chunk)
+		elif key == 'add_ref':
+			link = match.group('id')
+			insert_sequence.append(link)
+			left_chunk = rx_dict["add_ref"].sub("", left_chunk)
 
-        elif (key == 'link') or (options['link-all'] and (key == 'cross_ref')):
-            link = match.group('id')
-            if (link in z_map) and (z_map[link]["type"] in ['quote', 'left_text', 'right_text']):
-                left_chunk = rx_dict["link"].sub(_out_quoteref(z_map[link]["ref"], link), left_chunk) 
-            elif (z_item["type"] not in [ "citation" ]) and ((z_item["type"] == "index") or (options["only-link-from-index"] is not True)):
-	            if (link not in z_map) and (z_item["type"] not in [ "index", "sequential" ]):
-	            	unindexed_links.append(link)
-	            _z_add_to_stack(link, "body")
-	            left_chunk = rx_dict[key].sub(_out_link(z_map[link]["ref"], link), left_chunk)
-    	    else:
-    	    	left_chunk = rx_dict[key].sub(_out_commented_id(link), left_chunk)
+		elif (key == 'link') or (options['link-all'] and (key == 'cross_ref')):
+			link = match.group('id')
+			if (link in z_map) and (z_map[link]["type"] in ['quote', 'left_text', 'right_text']):
+				left_chunk = rx_dict["link"].sub(_out_quoteref(z_map[link]["ref"], link), left_chunk) 
+			elif (z_item["type"] not in [ "citation" ]) and ((z_item["type"] == "index") or (options["only-link-from-index"] is not True)):
+				if (link not in z_map) and (z_item["type"] not in [ "index", "sequential" ]):
+					unindexed_links.append(link)
+				_z_add_to_stack(link, "body")
+				left_chunk = rx_dict[key].sub(_out_link(z_map[link]["ref"], link), left_chunk)
+			else:
+				left_chunk = rx_dict[key].sub(_out_commented_id(link), left_chunk)
 
-        elif key in [ 'cross_ref', 'cross_ref_alt' ]:
-            link = match.group('id')
-            left_chunk = rx_dict[key].sub(_out_commented_id(link, pre=STR_SIGN_COMMENT), left_chunk)
+		elif key in [ 'cross_ref', 'cross_ref_alt' ]:
+			link = match.group('id')
+			left_chunk = rx_dict[key].sub(_out_commented_id(link, pre=STR_SIGN_COMMENT), left_chunk)
 
-        elif key == 'no_ref':
-            link = match.group('id')
-            left_chunk = rx_dict["no_ref"].sub(_out_commented_id(link), left_chunk)
+		elif key == 'no_ref':
+			link = match.group('id')
+			left_chunk = rx_dict["no_ref"].sub(_out_commented_id(link), left_chunk)
 
-        elif key == 'footnote':
-            fn_id = match.group('fn_id')
-            left_chunk = rx_dict['footnote'].sub("[^fn-" + zettel_id + "-" + fn_id + "]", left_chunk)
+		elif key == 'footnote':
+			fn_id = match.group('fn_id')
+			left_chunk = rx_dict['footnote'].sub("[^fn-" + zettel_id + "-" + fn_id + "]", left_chunk)
 
 
 
-       	return left_chunk + parse_chunk(chunk[end:])
+		return left_chunk + parse_chunk(chunk[end:])
 
-    with open(filepath, 'r') as file_object:
-    	lines = file_object.read().splitlines()
+	with open(filepath, 'r') as file_object:
+		lines = file_object.read().splitlines()
 
-    zettel_title = 'Untitled'
-    for line in lines:
-    	insert_quotes = []
-    	insert_parallel_texts = []
-    	insert_sequence = []
+	zettel_title = 'Untitled'
+	for line in lines:
+		insert_quotes = []
+		insert_parallel_texts = []
+		insert_sequence = []
 		# at each line check for a match with a regex
-        key, match, end = _parse_line(line, rx_dict)
+		key, match, end = _parse_line(line, rx_dict)
 
-        if yaml_divert:
-	       	yaml_divert = not key in ["yaml_div", "yaml_end_div"]
-	       	if key == 'title':
-	       		zettel_title = match.group('id')
-	       		z_item['title'] = zettel_title
-	       	continue
+		if yaml_divert:
+		   	yaml_divert = not key in ["yaml_div", "yaml_end_div"]
+		   	if key == 'title':
+		   		zettel_title = match.group('id')
+		   		z_item['title'] = zettel_title
+		   	continue
 
-        if key == "yaml_div":
-        	yaml_divert = True
-        	continue
+		if key == "yaml_div":
+			yaml_divert = True
+			continue
 
-        if key == "ignore":
-        	continue
+		if key == "ignore":
+			continue
 
-        # if the first content in a note is a heading, then insert
-        # our paragraph heading after, not before it
+		# if the first content in a note is a heading, then insert
+		# our paragraph heading after, not before it
 
-        if (key == "md_heading") and not got_content:
-        	if (z_item["type"] != "quote" and ((not options['handout-mode']) or options['handout-with-sections'])): # headings in citation notes are ~~for handouts only~~ good for nothing
-	        	data.append(line)
-	        	data.append('')
-	        got_content = False
-        	continue
+		if (key == "md_heading") and not got_content:
+			if (z_item["type"] != "quote" and ((not options['handout-mode']) or options['handout-with-sections'])): # headings in citation notes are ~~for handouts only~~ good for nothing
+				data.append(line)
+				data.append('')
+			got_content = False
+			continue
 
-        if (not line == '') and not got_content:
+		if (not line == '') and not got_content:
 			if (not options['handout-mode']):
 				if (z_item["type"] == "body"):
 					data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
@@ -407,7 +407,7 @@ def parse_zettel(z_item, zettel_id):
 					data.append(_out_commented_id(zettel_id, pre=STR_SIGN_INSERT))
 			got_content = True
 
-        if got_content:
+		if got_content:
 			if options['handout-mode']:
 				if key == 'md_heading' and options['handout-with-sections']:
 					data.append(line)
@@ -423,30 +423,30 @@ def parse_zettel(z_item, zettel_id):
 					line = _md_quote(line)
 				data.append(line)
 
-        if insert_sequence is not []:
+		if insert_sequence is not []:
 			for i in insert_sequence:
 				_z_add_to_stack(i, "sequential")
 				data = data + ['\n'] + parse_zettel(z_map[i], i)
 
-       	if insert_quotes is not []:
-       		for i in insert_quotes:
-       			_z_add_to_stack(i, "quote")					# add to stack...
-       			insert_data = parse_zettel(z_map[i], i)
-       			data = data + ['\n'] + insert_data 			# ...but insert immediately after line
+		if insert_quotes is not []:
+	   		for i in insert_quotes:
+	   			_z_add_to_stack(i, "quote")					# add to stack...
+	   			insert_data = parse_zettel(z_map[i], i)
+	   			data = data + ['\n'] + insert_data 			# ...but insert immediately after line
 
-       	if insert_parallel_texts is not []:
-       		for l, r in insert_parallel_texts:
-       			_z_add_to_stack(l, 'left_text')
-       			_z_add_to_stack(r, 'right_text')
-       			insert_data = _out_parallel_texts(l, r)
-       			data = data + ['\n'] + insert_data
+		if insert_parallel_texts is not []:
+	   		for l, r in insert_parallel_texts:
+	   			_z_add_to_stack(l, 'left_text')
+	   			_z_add_to_stack(r, 'right_text')
+	   			insert_data = _out_parallel_texts(l, r)
+	   			data = data + ['\n'] + insert_data
 
-    if (z_item['type'] in ['right_text']) and not options['handout-mode']:
-    	while (data[-1] is '\n'):
-    		del data[-1]									# remove trailing lines
-    	data[-1] = data[-1] + ' (' + zettel_title + ')'		# add reference to last line in quote
+	if (z_item['type'] in ['right_text']) and not options['handout-mode']:
+		while (data[-1] == '\n'):
+			del data[-1]									# remove trailing lines
+		data[-1] = data[-1] + ' (' + zettel_title + ')'		# add reference to last line in quote
 
-    return data
+	return data
 
 def stream_to_marked(data):
 	from AppKit import NSPasteboard
