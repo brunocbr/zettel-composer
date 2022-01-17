@@ -128,7 +128,7 @@ Bilingual passages may be inserted by designating "left" and "right" texts:
 
 In normal mode, the "left" text will be printed first, followed by the "right" text (unless this behaviour is modified by `-G`).
 
-With option `-P`, parallel texts are rendered in `LaTeX` (via `pandoc`), the output requiring for later processing a `\ParallelTexts` macro that you should define in your pandoc template (making use of `reledpar` or other package). 
+With option `-P`, parallel texts are rendered in `LaTeX` (via `pandoc`), the output requiring for later processing a `\ParallelTexts` macro that you should define e. g. in your pandoc template (making use of `reledpar` or other package). 
 
 ```latex
 \ParallelTexts{%
