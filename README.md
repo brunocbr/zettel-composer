@@ -34,7 +34,7 @@ With the above command, the script will simply print the combined notes and quit
 
 The `index` note will control the order in which notes will be printed. It is recommended that you include all the relevant notes in the index, e. g. in an outline (but the script will also include others as it finds references while scanning the notes).
 
-Usually when working with "Zettelkasten" notes, you'll want to make cross references to notes not necessarily intended for "public" consumption. This is why the default behaviour is to only reference and print notes using a non-standard notation of wiki links prefixed by the section mark (this character can usually be typed with `⌥ 6` on the mac, `C-x 8 S` in emacs):
+Often when working with "Zettelkasten" notes, you'll want to make cross references to notes not necessarily intended for "public" consumption. This is why the default behaviour is to only reference and print notes using a non-standard notation of wiki links prefixed by the section mark (this character can usually be typed with `⌥ 6` on the mac, `C-x 8 S` in emacs):
 
 ```
 This is a reference to § [[1234]].
