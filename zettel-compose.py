@@ -53,7 +53,7 @@ rx_dict = OrderedDict([
 	('pandoc_cite', re.compile(r'@ *\[\[(?P<id>\d{3,})\]\]')),			#  @ [[dddd]]
 	('no_ref', re.compile(r'- *\[\[(?P<id>\d{3,})\]\]')),		   		#  - [[dddd]]		do not add note
 	('quote', re.compile(r' *>\s{0,1}\[\[(?P<id>\d{3,})\]\]')), 		#  > [[dddd]]		insert quote immediately
-	('add_ref', re.compile(r'\+ *\[\[(?P<id>\d{3,})\]\]')), 				#  + [[dddd]]		insert note immediately
+	('add_ref', re.compile(r'\+ *\[\[(?P<id>\d{3,})\]\]')), 			#  + [[dddd]]		insert note immediately
 	('link', re.compile(r'§ *\[\[(?P<id>\d{3,})\]\]')),					#  § [[dddd]]		print reference to paragraph or text
 	('cross_ref_alt', re.compile(r'\[\[(?P<id>\d{3,})\]\] *:')),   		#   [[dddd]] :		hidden cross reference
 	('cross_ref', re.compile(r'\s*\[\[(?P<id>\d{3,})\]\]')),			#   [[dddd]]		hidden cross reference
@@ -532,6 +532,10 @@ def watch_folder():
 useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:PL', [ 'no-commented-references', 
 	'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 
 	'suppress-index', 'no-separator', 'link-all', 'custom-url='])
+
+
+if infile == [ ]:
+	raise ValueError("Argument is missing: you must provide a file name for the index note.")
 
 _initialize_stack()
 
