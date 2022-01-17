@@ -90,11 +90,14 @@ You may create a note (`1235` in this example) containing but a quote or fragmen
 > [[1235]]
 ```
 
-The quote will receive a sequential numerical identification (`T1`, `T2`, `T3` etc.) and may be later referenced[^2] (wiki links will be transformed in `T1`, `T2`, `T3` etc.).
 
 This is very useful if you do translations, as you may work with them in notes separated from the text where they are to be included (e. g. a paper, lecture notes). You can also create handouts from the very same note, using the handout option (`-h`).
 
-But if you just want to insert the contents of the body of a  note[^1], without any special handling, you can use the following:
+The quote will receive a sequential numerical identification (`T1`, `T2`, `T3` etc.) and may be later referenced[^2] (wiki links will be transformed in `T1`, `T2`, `T3` etc.).
+
+The quoted note's title is assumed to be a citation reference and will be printed either inside parentheses or in a heading (respectivelly in normal and handout modes)[^3].
+
+If you just want to insert the contents of the body of a note[^1], without any special handling, you can use the following:
 
 ```
 + [[1235]]
@@ -189,7 +192,9 @@ $HOME/GitHub/zettel-composer/zettel-compose.py -S -I -n --no-separator -O "${OUT
 ```
 
 
-[^1]: I speak of the "body" of a note because the script will recognize a YAML frontmatter and discard it.
+[^1]: I speak of the "body" of a note because the script will recognize a YAML frontmatter and certain field declarations inside it, such as `title:`, `citekey:` or `loc:` (for the later fields, see below).
 
 
 [^2]: The script doesn't currently support forwarding linking.
+
+[^3]: I suggest you use underline to format a note title, and avoid asterisks, e. g. `1234 PLATO. _Timaeus_, 29c.markdown`.
