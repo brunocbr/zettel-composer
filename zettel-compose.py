@@ -9,7 +9,6 @@ from glob import glob
 from collections import OrderedDict
 import os, time, sys, getopt
 import hashlib
-import subprocess
 
 KEY_CITEKEY = 'citekey'
 KEY_LOCATION = 'loc'
@@ -186,6 +185,8 @@ def _out_unindexed_notes():
 	return output
 
 def _out_latex_parallel_texts(left_text, right_text):
+	import subprocess
+
 	CMD = [CF_PANDOC, '-f', 'markdown', '-t', 'latex']
 
 	ps = subprocess.Popen(CMD,stdin=subprocess.PIPE,stdout=subprocess.PIPE)
