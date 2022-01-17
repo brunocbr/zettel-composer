@@ -54,6 +54,8 @@ By default, the script will threat every separate note as a "section" or "paragr
 
 Markdown headings in the beginning of the notes will be accomodated before the paragraph numbers, so that you can, e. g., break the output in different chapters and sections. You can also suppress paragraph headings by calling the script with the `-n` option.
 
+Footnote references will be adapted to avoid duplication.
+
 ### Basic parameters
 
 | Parameter                     | Description                          |
