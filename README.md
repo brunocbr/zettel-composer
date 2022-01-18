@@ -199,4 +199,4 @@ $HOME/GitHub/zettel-composer/zettel-compose.py -S -I -n --no-separator -O "${OUT
 
 [^2]: The script doesn't currently support forwarding linking.
 
-[^3]: I suggest you use underline to format a note title, and avoid asterisks, e. g. `1234 PLATO. _Timaeus_, 29c.markdown`.
+[^3]: I suggest that you use underline to format a note title, and avoid asterisks, e. g. `1234 PLATO. _Timaeus_, 29c.markdown`.
