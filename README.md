@@ -48,7 +48,7 @@ There's also a notation for references that necessarily will not be printed, eve
 [[1234]]: This develops some thoughts from a cross-referenced note that should never be printed.
 ```
 
-Other special notations are available for working with quotes and pandoc citations (see below).
+Other special conventions are available for working with quotes and pandoc citations (see below).
 
 By default, the script will threat every separate note as a "section" or "paragraph" and number them sequentially (`1.`, `2.`, `3.`). They can always be cross referenced with the `§ [[1234]]` notation (which yields `(§1)`, `(§2)`, `(§3)` etc. in the output).
 
@@ -130,7 +130,7 @@ Bilingual passages may be inserted by designating "left" and "right" texts:
 
 In normal mode, the "left" text will be printed first, followed by the "right" text (unless this behaviour is modified by `-G`).
 
-With option `-P`, parallel texts are rendered in `LaTeX` (via `pandoc`), the output requiring for later processing a `\ParallelTexts` macro that you should define e. g. in your pandoc template (making use of `reledpar` or other package). 
+With option `-P`, proper parallel texts are rendered in `LaTeX` (via `pandoc`), the output requiring for later processing a `\ParallelTexts` macro that you should define e. g. in your pandoc template (making use of `reledpar` or other package). 
 
 ```latex
 \ParallelTexts{%
