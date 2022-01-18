@@ -20,7 +20,7 @@ pip install -U pyobjc
 
 ## Basic features
 
-The script takes as its argument the name of a file which will be used as an `index` note. Wiki links prepended with a section sign (`§ [[1234]]`) in the index will produce the combination of the specified notes in the output:
+The script takes as its argument the name of a file which will be used as an `index` note. Wiki links prepended with a section sign (`§ [[1234]]`) in the index will produce the combination of the corresponding notes in the output:
 
 ```sh
 ~/GitHub/zettel-composer/zettel-compose.py "~/archive/2345 My index note.markdown"
