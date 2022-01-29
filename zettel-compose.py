@@ -40,7 +40,8 @@ options = {
 	'handout-mode': False,
 	'handout-with-sections': True,
 	'link-all': False, # link normal wikilinks
-	'custom-url': 'thearchive://match/'
+	'custom-url': 'thearchive://match/',
+	'section-symbol': '§'
 }
 
 rx_dict = OrderedDict([
@@ -136,9 +137,9 @@ def _out_link(ref, id):
 		return " {>> [[" + str(id) + "]] <<}"
 	else:
 		if options["heading-identifier"]:
-			return " ([§" + str(ref) + "](#" + options["heading-identifier"] + str(ref) + "))"
+			return " ([" + options['section-symbol'] + str(ref) + "](#" + options["heading-identifier"] + str(ref) + "))"
 		else:
-			return " (§" + str(ref) + ")"
+			return " (" + options['section-symbol'] + str(ref) + ")"
 
 def _out_linked_zettel(id):
 	return '[' + str(id) + '](' + options['custom-url'] + str(id) + ')'
@@ -532,7 +533,7 @@ def watch_folder():
 
 useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:PL', [ 'no-commented-references', 
 	'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 
-	'suppress-index', 'no-separator', 'link-all', 'custom-url='])
+	'suppress-index', 'no-separator', 'link-all', 'custom-url=', 'section-symbol='])
 
 
 if infile == [ ]:
@@ -579,6 +580,8 @@ for opt, arg in useroptions:
 		options['link-all'] = True
 	elif opt in ('--custom-url='):
 		options['custom-url'] = arg
+	elif opt in ('--section-symbol='):
+		options['section-symbol'] = arg
 
 
 index_filename = infile[0]
