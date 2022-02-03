@@ -79,7 +79,7 @@ Footnote references will be adapted to avoid duplication.
 | `-C`, `--no-commented-references`      | Disable CriticMarkup comments.                                                                                           |
 | `-s`, `--sleep-time=` *seconds*        | How long to "sleep" between file watching cycles. Default is 2 seconds.                                                  |
 | `-H`, `--heading-identifier=` *string* |                                                                                                                          |
-| `--section-symbol=` *string*           | Set symbol used to reference the sections/paragraphs. Default is `§`.                                                    |
+| `--section-symbol=` *string*           | Set symbol used in the output to print references to sections/paragraphs. Default is `§`.                                |
 
 
 
