@@ -43,7 +43,7 @@ options = {
 	'custom-url': 'thearchive://match/',
 	'section-symbol': '§',
 	'insert-title': False,
-	'insert-bib-ref': True
+	'insert-bib-ref': False
 }
 
 rx_dict = OrderedDict([
