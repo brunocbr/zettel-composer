@@ -41,7 +41,9 @@ options = {
 	'handout-with-sections': True,
 	'link-all': False, # link normal wikilinks
 	'custom-url': 'thearchive://match/',
-	'section-symbol': '§'
+	'section-symbol': '§',
+	'insert-title': False,
+	'insert-bib-ref': True
 }
 
 rx_dict = OrderedDict([
@@ -289,6 +291,7 @@ def parse_zettel(z_item, zettel_id):
 
 	yaml_divert = False
 	got_content = False
+	got_title = False
 	insert_sequence = []
 
 	data = [] # create an empty list to collect the data
@@ -391,10 +394,14 @@ def parse_zettel(z_item, zettel_id):
 			if (z_item["type"] != "quote" and ((not options['handout-mode']) or options['handout-with-sections'])): # headings in citation notes are ~~for handouts only~~ good for nothing
 				data.append(line)
 				data.append('')
+				got_title = True
 			got_content = False
 			continue
 
 		if (not line == '') and not got_content:
+			if not got_title:
+				data.append("## " + zettel_title)
+				got_title = True
 			if (not options['handout-mode']):
 				if (z_item["type"] == "body"):
 					data.append(_out_paragraph_heading(z_item["ref"], zettel_id))
@@ -447,6 +454,11 @@ def parse_zettel(z_item, zettel_id):
 		while (data[-1] == '\n'):
 			del data[-1]									# remove trailing lines
 		data[-1] = data[-1] + ' (' + zettel_title + ')'		# add reference to last line in quote
+	elif options['insert-bib-ref']:
+		citetxt = _pandoc_citetext(zettel_id)
+		if citetxt:
+			data.append('')
+			data.append("@" + citetxt)
 
 	return data
 
@@ -533,7 +545,7 @@ def watch_folder():
 
 useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:PL', [ 'no-commented-references', 
 	'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 
-	'suppress-index', 'no-separator', 'link-all', 'custom-url=', 'section-symbol='])
+	'suppress-index', 'no-separator', 'link-all', 'custom-url=', 'section-symbol=', 'insert-title', 'insert-bib-ref'])
 
 
 if infile == [ ]:
@@ -582,7 +594,10 @@ for opt, arg in useroptions:
 		options['custom-url'] = arg
 	elif opt in ('--section-symbol='):
 		options['section-symbol'] = arg
-
+	elif opt in ('--insert-title'):
+		options['insert-title'] = True
+	elif opt in ('--insert-bib-ref'):
+		options['insert-bib-ref'] = True
 
 index_filename = infile[0]
 if options["verbose"]:
