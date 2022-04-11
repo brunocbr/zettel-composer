@@ -470,8 +470,7 @@ def stream_to_marked(data):
 
 	pb = NSPasteboard.pasteboardWithName_("mkStreamingPreview")
 	pb.clearContents()
-	pb.setString_forType_(data.decode('utf-8'), 'public.utf8-plain-text')
-
+	pb.setString_forType_(data, 'public.utf8-plain-text')
 
 def get_first_modified():
 	global z_stack
