@@ -400,7 +400,8 @@ def parse_zettel(z_item, zettel_id):
 
 		if (not line == '') and not got_content:
 			if not got_title:
-				data.append("## " + zettel_title)
+				if (not z_item["type"] != "quote"):  # insert note title as ATX heading unless it's a quote
+					data.append("## " + zettel_title)
 				got_title = True
 			if (not options['handout-mode']):
 				if (z_item["type"] == "body"):
