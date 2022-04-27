@@ -192,10 +192,10 @@ def _out_latex_parallel_texts(left_text, right_text):
 
 	CMD = [CF_PANDOC, '-f', 'markdown', '-t', 'latex']
 
-	ps = subprocess.Popen(CMD,stdin=subprocess.PIPE,stdout=subprocess.PIPE)
-	left_text = (ps.communicate(input="\n".join(left_text))[0]).splitlines()
+	ps = subprocess.Popen(CMD,stdin=subprocess.PIPE,stdout=subprocess.PIPE,encoding="utf-8")
+	left_text = (ps.communicate(input='\n'.join(left_text))[0]).splitlines()
 
-	ps = subprocess.Popen(CMD,stdin=subprocess.PIPE,stdout=subprocess.PIPE)
+	ps = subprocess.Popen(CMD,stdin=subprocess.PIPE,stdout=subprocess.PIPE,encoding="utf-8")
 	right_text = (ps.communicate(input="\n".join(right_text))[0]).splitlines()
 
 	output = ['\ParallelTexts{%'] + left_text + ['}{'] + right_text + ['}'] + ['']
