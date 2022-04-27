@@ -420,6 +420,7 @@ def parse_zettel(z_item, zettel_id):
 		if got_content:
 			if options['handout-mode']:
 				if key == 'md_heading' and options['handout-with-sections']:
+					data.append('') # prepend a line for safety reasons
 					data.append(line)
 					data.append('')
 				else:
