@@ -17,8 +17,8 @@ CF_PANDOC ='pandoc'
 
 STR_UNINDEXED_HEADING = '# Unindexed'
 STR_STREAMING_ID = "<!--\nzettel-compose.py\n-->\n"
-STR_SIGN_INSERT = '▾ '	# = '▾ '
-STR_SIGN_COMMENT = '▸ ' # =  '❧ '  = '▹ '
+STR_SIGN_INSERT = ' ▼ '	# = '▾ '
+STR_SIGN_COMMENT = ' ► ' # =  '❧ '  = '▹ '
 STR_HANDOUT_HEADING = '####'
 SEPARATOR = [ '\n', '-----', '\n' ]
 
@@ -144,8 +144,8 @@ def _out_link(ref, id):
 		else:
 			return " (" + options['section-symbol'] + str(ref) + ")"
 
-def _out_linked_zettel(id):
-	return '[' + str(id) + '](' + options['custom-url'] + str(id) + ')'
+def _out_linked_zettel(id, anchor):
+	return '[' + anchor + '](' + options['custom-url'] + str(id) + ')'
 
 def _out_quoteref(ref, id):
 	"""
@@ -173,7 +173,7 @@ def _out_commented_id(zettel_id, pre = "", post=""):
 	if options['no-commented-references']:
 		return ''
 	else:
-		return ' {>> ' + pre + _out_linked_zettel(zettel_id) + post + ' <<}'
+		return ' {>> ' + _out_linked_zettel(zettel_id, pre) + post + ' <<}'
 
 def _out_text_quote(ref, zettel_id):
 	"""
