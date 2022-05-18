@@ -228,11 +228,16 @@ def _out_parallel_texts(left, right):
 	return output
 
 def _parse_line(line, thedict):
+	l = [ ]
 	for key, rx in thedict.items():
 		match = rx.search(line)
 		if match:
-			return key, match, match.end()
-	return None, None, None
+			l.append((key, match))
+	if l:
+		r = sorted(l, key=lambda x: x[1].start())[0]
+		return r[0], r[1], r[1].end()
+	else:
+		return None, None, None
 
 def _remove_md_quotes(line):
 	rx = re.compile(r'^\s*>\s*')
