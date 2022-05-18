@@ -42,7 +42,7 @@ options = {
 	'link-all': False, # link normal wikilinks
 	'custom-url': 'thearchive://match/',
 	'section-symbol': '§',
-	'insert-title': False,
+	'no-title': False,
 	'insert-bib-ref': False
 }
 
@@ -400,7 +400,7 @@ def parse_zettel(z_item, zettel_id):
 
 		if (not line == '') and not got_content:
 			if not got_title:
-				if (not z_item["type"] in ['quote', 'left_text', 'right_text']):  # insert note title as ATX heading unless it's a quote
+				if not options['no-title'] and not z_item["type"] in ['quote', 'left_text', 'right_text']:  # insert note title as ATX heading unless it's a quote
 					data.append("## " + zettel_title)
 				got_title = True
 			if (not options['handout-mode']):
@@ -546,7 +546,7 @@ def watch_folder():
 
 useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:PL', [ 'no-commented-references', 
 	'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 
-	'suppress-index', 'no-separator', 'link-all', 'custom-url=', 'section-symbol=', 'insert-title', 'insert-bib-ref'])
+	'suppress-index', 'no-separator', 'link-all', 'custom-url=', 'section-symbol=', 'no-title', 'insert-bib-ref'])
 
 
 if infile == [ ]:
@@ -595,8 +595,8 @@ for opt, arg in useroptions:
 		options['custom-url'] = arg
 	elif opt in ('--section-symbol='):
 		options['section-symbol'] = arg
-	elif opt in ('--insert-title'):
-		options['insert-title'] = True
+	elif opt in ('--no-title'):
+		options['no-title'] = True
 	elif opt in ('--insert-bib-ref'):
 		options['insert-bib-ref'] = True
 

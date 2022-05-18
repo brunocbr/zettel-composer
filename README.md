@@ -70,7 +70,7 @@ Footnote references will be adapted to avoid duplication.
 ### Some tweaks
 
 | Parameter                              | Description                                                                                                              |
-| ----------                             | ----------                                                                                                               |
+|----------------------------------------|--------------------------------------------------------------------------------------------------------------------------|
 | `--link-all` or `-L`                   | Link and print all wiki linked notes, even if not prefixed by `§`.                                                       |
 | `-n`, `--no-paragraph-headings`        | Do not print paragraph headings (`1.`, `2.`, `3.` etc.)                                                                  |
 | `--no-separator`                       | Do not separate notes in the output with a horizontal bar.                                                               |
@@ -80,6 +80,7 @@ Footnote references will be adapted to avoid duplication.
 | `-s`, `--sleep-time=` *seconds*        | How long to "sleep" between file watching cycles. Default is 2 seconds.                                                  |
 | `-H`, `--heading-identifier=` *string* |                                                                                                                          |
 | `--section-symbol=` *string*           | Set symbol used in the output to print references to sections/paragraphs. Default is `§`.                                |
+| `--no-title`                           | Do not create headings out of a note's `title` field                                                                     |
 
 
 
