@@ -43,7 +43,8 @@ options = {
 	'custom-url': 'thearchive://match/',
 	'section-symbol': '§',
 	'no-title': False,
-	'insert-bib-ref': False
+	'insert-bib-ref': False,
+	'no-front-matter': False
 }
 
 rx_dict = OrderedDict([
@@ -378,10 +379,14 @@ def parse_zettel(z_item, zettel_id):
 		   	if key == 'title':
 		   		zettel_title = match.group('id')
 		   		z_item['title'] = zettel_title
+		   	if z_item['type'] == 'index' and not options['no-front-matter']:
+		   		data.append(line)
 		   	continue
 
 		if key == "yaml_div":
 			yaml_divert = True
+			if z_item['type'] == 'index' and not options['no-front-matter']:
+				data.append(line)			
 			continue
 
 		if key == "ignore":
@@ -493,7 +498,8 @@ def parse_index(pathname):
 	global z_stack, z_map, options, unindexed_links
 
 	c = 0
-	parse_index.output = [ STR_STREAMING_ID ]
+	parse_index.output = [ ] # [ STR_STREAMING_ID ] not working?
+
 	parse_index.f_out = None
 
 	def write_to_output(contents):
@@ -546,8 +552,8 @@ def watch_folder():
 
 useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:PL', [ 'no-commented-references', 
 	'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 
-	'suppress-index', 'no-separator', 'link-all', 'custom-url=', 'section-symbol=', 'no-title', 'insert-bib-ref'])
-
+	'suppress-index', 'no-separator', 'link-all', 'custom-url=', 'section-symbol=', 'no-title', 'insert-bib-ref',
+	'no-front-matter'])
 
 if infile == [ ]:
 	raise ValueError("Argument is missing: you must provide a file name for the index note.")
@@ -599,6 +605,8 @@ for opt, arg in useroptions:
 		options['no-title'] = True
 	elif opt in ('--insert-bib-ref'):
 		options['insert-bib-ref'] = True
+	elif opt in ('--no-front-matter'):
+		options['no-front-matter'] = True
 
 index_filename = infile[0]
 if options["verbose"]:
