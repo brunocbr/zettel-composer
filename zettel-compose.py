@@ -101,7 +101,7 @@ def _get_file_md5digest(pathname):
 
 	with open(pathname, "rb") as a_file:
 		content = a_file.read()
-	
+
 	md5_hash.update(content)
 	digest = md5_hash.hexdigest()
 
@@ -332,7 +332,7 @@ def parse_zettel(z_item, zettel_id):
 
 		elif key == 'pandoc_cite_noauthor':
 			link = match.group('id')
-			_z_add_to_stack(link, "citation")			
+			_z_add_to_stack(link, "citation")
 			left_chunk = rx_dict["pandoc_cite_noauthor"].sub(_pandoc_cite_noauthor(link), left_chunk)
 
 		elif key == 'add_ref':
@@ -391,7 +391,7 @@ def parse_zettel(z_item, zettel_id):
 		if key == "yaml_div":
 			yaml_divert = True
 			if z_item['type'] == 'index' and not options['no-front-matter']:
-				data.append(line)			
+				data.append(line)
 			continue
 
 		if key == "ignore":
@@ -476,7 +476,7 @@ def parse_zettel(z_item, zettel_id):
 
 def stream_to_marked(data):
 	from AppKit import NSPasteboard
-	
+
 	if options["verbose"]:
 		print("Streaming...")
 
@@ -512,7 +512,7 @@ def parse_index(pathname):
 			contents = contents + SEPARATOR
 		if parse_index.f_out:
 			for l in contents:
-				parse_index.f_out.write("%s\n" % l)	
+				parse_index.f_out.write("%s\n" % l)
 		if options["stream-to-marked"]:
 			parse_index.output = parse_index.output + contents
 
@@ -555,8 +555,8 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:PL', [ 'no-commented-references', 
-	'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 
+useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:PL', [ 'no-commented-references',
+	'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked',
 	'suppress-index', 'no-separator', 'link-all', 'custom-url=', 'section-symbol=', 'no-title', 'insert-bib-ref',
 	'no-front-matter'])
 
