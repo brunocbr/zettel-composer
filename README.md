@@ -81,7 +81,7 @@ Footnote references will be adapted to avoid duplication.
 | `-H`, `--heading-identifier=` *string* |                                                                                                                          |
 | `--section-symbol=` *string*           | Set symbol used in the output to print references to sections/paragraphs. Default is `§`.                                |
 | `--no-title`                           | Do not create headings out of a note's `title` field                                                                     |
-
+| `--no-front-matter`                    | Do not print the YAML front-matter from the index note.                                                                  |
 
 
 ## Advanced features
