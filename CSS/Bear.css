@@ -476,4 +476,13 @@ table tr:nth-child(even), table td:nth-child(even) {
 
 .mkstyle--swiss #wrapper aside.blurb:before {
 	margin-top: .7em
-}  padding: 50px;
+}
+
+
+.synopsis {
+/*  width: 300px; */
+  border: 15px solid rgba(0, 0, 0, 0.25);
+  padding: 50px;
+  margin: 20px;
+}
+

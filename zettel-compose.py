@@ -44,7 +44,8 @@ options = {
 	'section-symbol': '§',
 	'no-title': False,
 	'insert-bib-ref': False,
-	'no-front-matter': False
+	'no-front-matter': False,
+    'extract-mode': False
 }
 
 rx_dict = OrderedDict([
@@ -507,12 +508,15 @@ def parse_index(pathname):
 
 	parse_index.f_out = None
 
-	def write_to_output(contents):
+	def write_to_output(contents, zn=None):
 		if not options['no-separator']:
 			contents = contents + SEPARATOR
 		if parse_index.f_out:
-			for l in contents:
-				parse_index.f_out.write("%s\n" % l)
+			if options['extract-mode'] and (zn is not None):
+				parse_index.f_out.write("%s\n" % z_map[zn]["path"])
+			else:
+				for l in contents:
+					parse_index.f_out.write("%s\n" % l)	
 		if options["stream-to-marked"]:
 			parse_index.output = parse_index.output + contents
 
@@ -529,10 +533,10 @@ def parse_index(pathname):
 		if z_map[z_stack[c]]['type'] not in [ 'quote', 'citation', 'left_text', 'right_text' ]:
 			d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
 			if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index") and (z_map[z_stack[c]]["type"] not in [ "sequential" ]):
-				write_to_output(d)
+				write_to_output(d, z_stack[c])
 		c += 1
 
-	if unindexed_links:
+	if unindexed_links and not options['extract-mode']:
 		d = _out_unindexed_notes()
 		write_to_output(d)
 
@@ -555,8 +559,8 @@ def watch_folder():
 			parse_index(index_filename)
 		time.sleep(options["sleep-time"])
 
-useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:PL', [ 'no-commented-references',
-	'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked',
+useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:PLX', [ 'no-commented-references', 
+	'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 
 	'suppress-index', 'no-separator', 'link-all', 'custom-url=', 'section-symbol=', 'no-title', 'insert-bib-ref',
 	'no-front-matter'])
 
@@ -612,6 +616,8 @@ for opt, arg in useroptions:
 		options['insert-bib-ref'] = True
 	elif opt in ('--no-front-matter'):
 		options['no-front-matter'] = True
+	elif opt in ('-X'):
+		options['extract-mode'] = True
 
 index_filename = infile[0]
 if options["verbose"]:
