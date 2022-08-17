@@ -513,7 +513,7 @@ def parse_index(pathname):
 			contents = contents + SEPARATOR
 		if parse_index.f_out:
 			if options['extract-mode'] and (zn is not None):
-				parse_index.f_out.write("%s\n" % z_map[zn]["path"])
+				parse_index.f_out.write("%s\n" % z_map[zn]["ref"])
 			else:
 				for l in contents:
 					parse_index.f_out.write("%s\n" % l)	
