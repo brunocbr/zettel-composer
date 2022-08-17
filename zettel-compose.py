@@ -512,8 +512,9 @@ def parse_index(pathname):
 		if not options['no-separator']:
 			contents = contents + SEPARATOR
 		if parse_index.f_out:
-			if options['extract-mode'] and (zn is not None):
-				parse_index.f_out.write("%s\n" % zn)
+			if options['extract-mode']:
+				if (zn not in [ None, 'index' ]):
+					parse_index.f_out.write("%s\n" % zn)
 			else:
 				for l in contents:
 					parse_index.f_out.write("%s\n" % l)	
