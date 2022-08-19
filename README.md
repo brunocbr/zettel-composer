@@ -58,14 +58,15 @@ Footnote references will be adapted to avoid duplication.
 
 ### Basic parameters
 
-| Parameter                     | Description                          |
-|-------------------------------|--------------------------------------|
-| `-S`, `--suppress-index`      | Do not print the `index` note.       |
-| `-W`, `--watch`               | Don't quit, watch files for changes. |
-| `-M`, `--stream-to-marked`    | Stream to Marked 2.                  |
-| `-O`, `--output=` *file name* | Specify *file name* as the output.   |
-| `-v`                          | Verbose mode.                        |
-| `-X`                          | Extract mode: only print filenames.  |
+| Parameter                     | Description                            |
+|-------------------------------|----------------------------------------|
+| `-S`, `--suppress-index`      | Do not print the `index` note.         |
+| `-W`, `--watch`               | Don't quit, watch files for changes.   |
+| `-M`, `--stream-to-marked`    | Stream to Marked 2.                    |
+| `-O`, `--output=` *file name* | Specify *file name* as the output.     |
+| `-v`                          | Verbose mode.                          |
+| `-X`                          | Extract mode: only print the note ids. |
+
 
 ### Some tweaks
 
