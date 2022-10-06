@@ -200,7 +200,7 @@ def _out_latex_parallel_texts(left_text, right_text):
 	ps = subprocess.Popen(CMD,stdin=subprocess.PIPE,stdout=subprocess.PIPE,encoding="utf-8")
 	right_text = (ps.communicate(input="\n".join(right_text))[0]).splitlines()
 
-	output = ['\ParallelTexts{%'] + left_text + ['}{'] + right_text + ['}'] + ['']
+	output = ['\ParallelTexts{%'] + left_text + ['}{%'] + right_text + ['}'] + ['']
 	return output
 
 def _out_parallel_texts(left, right):
