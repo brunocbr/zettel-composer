@@ -16,7 +16,7 @@ from datetime import datetime
 fields_dict = OrderedDict([
 	('origin', re.compile(r'^origin:\s+(?P<value>.*)$')),
 	('tags', re.compile(r'^tags:\s+(?P<value>.*)$')),
-	('uplink', re.compile(r'^uplink:\s+(?P<value>\d{3,})$')),
+	('uplink', re.compile(r'^uplink:\s+(?P<value>\d{3,})\s*$')),
 	('blank_line', re.compile(r'^  $')) # two spaces in a line is a blank to be disconsidered
 ])
 
