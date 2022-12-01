@@ -64,7 +64,7 @@ rx_dict = OrderedDict([
 	('yaml_end_div', re.compile(r'^\.\.\.$')),
 	('yaml_div', re.compile(r'^\-\-\-$')),
 	('md_heading', re.compile(r'^#{1,4}[\s\w]')),
-	('title', re.compile(r"^title:\s*['\"]{0,1}(?P<id>.*)['\"]{0,1}s*$"))
+	('title', re.compile(r"^title:\s*['\"](?P<id>.*)['\"]\s*$"))
 ])
 
 fields_dict = {
