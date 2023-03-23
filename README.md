@@ -2,6 +2,8 @@
 
 A tool for combining notes in a "Zettelkasten" system based on Markdown and wiki links.
 
+![animated demo](zettel-composer-demo.gif)
+
 ## Installation
 
 Clone the project in a directory of your choosing (e. g. `~/GitHub`):
