@@ -9,7 +9,6 @@ from glob import glob
 from collections import OrderedDict
 import os, time, sys, getopt
 import hashlib
-import codecs
 
 KEY_CITEKEY = 'citekey'
 KEY_LOCATION = 'loc'
@@ -263,7 +262,7 @@ def _pandoc_citetext(zettel_id):
 	loc = None
 	filepath, mtime = _z_get_filepath(zettel_id)
 
-	with codecs.open(filepath, 'r', 'UTF-8') as file_obj:
+	with open(filepath, 'r') as file_obj:
 		lines = file_obj.read().splitlines()
 
 	for line in lines:
@@ -370,7 +369,7 @@ def parse_zettel(z_item, zettel_id):
 
 		return left_chunk + parse_chunk(chunk[end:])
 
-	with codecs.open(filepath, 'r', 'UTF-8') as file_object:
+	with open(filepath, 'r') as file_object:
 		lines = file_object.read().splitlines()
 
 	zettel_title = 'Untitled'
@@ -525,7 +524,7 @@ def parse_index(pathname):
 	_z_set_index(pathname)
 
 	if options["output"] and (options["output"] != '-'):
-		parse_index.f_out = codec.open(options["output"], "w", 'UTF-8')
+		parse_index.f_out = open(options["output"], "w")
 	elif not options["stream-to-marked"]:
 		parse_index.f_out = sys.stdout
 
@@ -633,3 +632,4 @@ if options["watch"]:
 	if options["verbose"]:
 		print("Will now watch for changes")
 	watch_folder()
+
