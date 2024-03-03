@@ -300,8 +300,8 @@ def parse_zettel(z_item, zettel_id):
 	got_content = False
 	got_title = False
 	insert_sequence = []
-
-	data = [] # create an empty list to collect the data
+	data = []
+	frontmatter = []
 
 	def parse_chunk(chunk):
 		key, match, end = _parse_line(chunk, rx_dict)
@@ -381,18 +381,16 @@ def parse_zettel(z_item, zettel_id):
 		key, match, end = _parse_line(line, rx_dict)
 
 		if yaml_divert:
-		   	yaml_divert = not key in ["yaml_div", "yaml_end_div"]
-		   	if key == 'title':
-		   		zettel_title = match.group('id')
-		   		z_item['title'] = zettel_title
-		   	if z_item['type'] == 'index' and not options['no-front-matter']:
-		   		data.append(line)
-		   	continue
+			yaml_divert = not key in ["yaml_div", "yaml_end_div"]
+			if key == 'title':
+				zettel_title = match.group('id')
+				z_item['title'] = zettel_title
+			frontmatter.append(line)
+			continue
 
 		if key == "yaml_div":
 			yaml_divert = True
-			if z_item['type'] == 'index' and not options['no-front-matter']:
-				data.append(line)
+			frontmatter.append(line)
 			continue
 
 		if key == "ignore":
@@ -473,6 +471,15 @@ def parse_zettel(z_item, zettel_id):
 			data.append('')
 			data.append("@" + citetxt)
 
+	if z_item['type'] == 'index':
+		if options['suppress-index']:
+			if not options['no-front-matter']:
+				data = frontmatter
+			else:
+				data = []
+		elif not options['no-front-matter']:
+			data = frontmatter + data
+
 	return data
 
 def stream_to_marked(data):
@@ -533,7 +540,7 @@ def parse_index(pathname):
 			print ("zettel id " + z_stack[c])
 		if z_map[z_stack[c]]['type'] not in [ 'quote', 'citation', 'left_text', 'right_text' ]:
 			d = parse_zettel(z_map[z_stack[c]], z_stack[c]) + ['']
-			if not (options["suppress-index"] and z_map[z_stack[c]]["type"] == "index") and (z_map[z_stack[c]]["type"] not in [ "sequential" ]):
+			if (z_map[z_stack[c]]["type"] not in [ "sequential" ]):
 				write_to_output(d, z_stack[c])
 		c += 1
 
