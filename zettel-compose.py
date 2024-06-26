@@ -124,10 +124,14 @@ def _z_add_to_stack(zettel_id, z_type):
 	global z_stack
 
 	if not zettel_id in z_map:
-		z_count[z_type] += 1
+		if z_type == 'right_text':
+			z_ref_type = 'quote' # counts as quote for numbering texts
+		else:
+			z_ref_type = z_type
+		z_count[z_ref_type] += 1
 		path, mtime = _z_get_filepath(zettel_id)
 		md5hash = _get_file_md5digest(path)
-		z_map[zettel_id] = { "type": z_type, "ref": z_count[z_type], "path": path, "mtime": mtime, "md5hash": md5hash }
+		z_map[zettel_id] = { "type": z_type, "ref": z_count[z_ref_type], "path": path, "mtime": mtime, "md5hash": md5hash }
 		if z_type in [ 'body', 'index', 'quote', 'citation', 'sequential', 'left_text', 'right_text' ]:
 			z_stack.append(zettel_id)
 	return z_map[zettel_id]
