@@ -29,7 +29,6 @@ options = {
 	"heading-identifier": "paragraph-",
 	"watch": False,
 	"sleep-time": 2,
-	"output": None,
 	"suppress-index": False,
 	"only-link-from-index": False,
 	"verbose": False,
