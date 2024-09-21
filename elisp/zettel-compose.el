@@ -87,7 +87,7 @@
     ;; Return the arguments
     args))
 
-
+;;;###autoload
 (defun zettel-compose-run (options)
   "Run the zettel-compose.py script with OPTIONS."
   (interactive
@@ -104,6 +104,7 @@
     (message "Running command: %s" command)
     (start-process-shell-command "*zettel-compose*" output-buffer-name command)))
 
+;;;###autoload
 (defun zettel-compose-stop-all-processes ()
   "Stop all running asynchronous zettel-compose processes."
   (interactive)
