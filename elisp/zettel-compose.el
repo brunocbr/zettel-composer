@@ -99,9 +99,25 @@
                  :watch watch
                  :index-file (buffer-file-name (current-buffer))))))
   (let* ((args (zettel-compose--build-args options))
-         (command (mapconcat 'identity (cons zettel-compose-script-path args) " ")))
+         (command (mapconcat 'identity (cons zettel-compose-script-path args) " "))
+         (output-buffer-name (generate-new-buffer-name "*zettel-compose-output*")))
     (message "Running command: %s" command)
-    (async-shell-command command "*zettel-compose-output*")))
+    (start-process-shell-command "*zettel-compose*" output-buffer-name command)))
+
+(defun zettel-compose-stop-all-processes ()
+  "Stop all running asynchronous zettel-compose processes."
+  (interactive)
+  (let ((processes (cl-remove-if-not
+                    (lambda (proc)
+                      (when proc
+                        (string-match-p "*zettel-compose*" (buffer-name (process-buffer proc)))))
+                    (mapcar #'get-buffer-process (buffer-list)))))
+    (if processes
+        (progn
+          (dolist (proc processes)
+            (delete-process proc))
+          (message "Stopped all zettel-compose processes."))
+      (message "No running zettel-compose processes found."))))
 
 (provide 'zettel-compose)
 
