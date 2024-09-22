@@ -4,7 +4,7 @@
   "Wrapper for zettel-compose.py script."
   :group 'tools)
 
-(defcustom zettel-compose-script-path "/usr/local/bin/zettel-compose.py"
+(defcustom zettel-compose-script-path "/usr/local/bin/zettel-compose"
   "Path to the zettel-compose.py script."
   :type 'string
   :group 'zettel-compose)
