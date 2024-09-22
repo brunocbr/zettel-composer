@@ -12,6 +12,12 @@ cd ~/GitHub
 clone https://github.com/brunocbr/zettel-composer.git
 ```
 
+Link the script to a path from where it can be executed, e. g.:
+
+```shell
+ln -s zettel-composer.py /usr/local/bin/zettel-compose
+```
+
 If you want to use Marked Streaming Preview, you have to install the Python Objective-C bridge:
 
 ```shell
