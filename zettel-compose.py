@@ -483,6 +483,9 @@ def stream_to_marked(data):
 
 	pb = NSPasteboard.pasteboardWithName_("mkStreamingPreview")
 	pb.clearContents()
+
+    # TODO: testar se este decode é necessário apenas no 2.7
+	data = data.decode('utf8')
 	pb.setString_forType_(data, 'public.utf8-plain-text')
 
 def get_first_modified():
