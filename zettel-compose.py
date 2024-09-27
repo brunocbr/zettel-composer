@@ -486,22 +486,23 @@ def parse_zettel(z_item, zettel_id):
 
 	return data
 
-def module_exists(module_name):
+def check_module_exists(module_name):
     try:
-        if sys.version_info[0] >= 3:  # Python 3
+        if sys.version_info[0] >= 3:
+            # Python 3: use importlib for checking installed modules
             import importlib
-            importlib.util.find_spec(module_name)
+            importlib.import_module(module_name)
         else:
-            import imp
-            imp.find_module(module_name)
+            # Python 2: use __import__ for compatibility
+            __import__(module_name)
         return True
     except ImportError:
         return False
-    except ModuleNotFoundError:
-        return False
+
+
 
 def appkit_available():
-    return module_exists('AppKit')
+    return check_module_exists('AppKit')
 
 def stream_to_marked(data):
 	from AppKit import NSPasteboard
