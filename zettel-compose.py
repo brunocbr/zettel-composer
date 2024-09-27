@@ -486,6 +486,23 @@ def parse_zettel(z_item, zettel_id):
 
 	return data
 
+def module_exists(module_name):
+    try:
+        if sys.version_info[0] >= 3:  # Python 3
+            import importlib
+            importlib.util.find_spec(module_name)
+        else:
+            import imp
+            imp.find_module(module_name)
+        return True
+    except ImportError:
+        return False
+    except ModuleNotFoundError:
+        return False
+
+def appkit_available():
+    return module_exists('AppKit')
+
 def stream_to_marked(data):
 	from AppKit import NSPasteboard
 
@@ -496,7 +513,8 @@ def stream_to_marked(data):
 	pb.clearContents()
 
     # TODO: testar se este decode é necessário apenas no 2.7
-	data = data.decode('utf8')
+	if sys.version_info[0] < 3:
+		data = data.decode('utf8')
 	pb.setString_forType_(data, 'public.utf8-plain-text')
 
 def get_first_modified():
@@ -588,7 +606,10 @@ for opt, arg in useroptions:
 	if opt in ('-O', '--output='):
 		options["output"] = arg
 	elif opt in ('-M', '--stream-to-marked'):
-		options["stream-to-marked"] = True
+		if appkit_available():
+			options["stream-to-marked"] = True
+		else:
+			print("Warning: can't stream because the AppKit module is not available")
 	elif opt in ('-H', '--heading-identifier='):
 		options["heading-identifier"] = arg
 	elif opt in ('-W', '--watch'):
