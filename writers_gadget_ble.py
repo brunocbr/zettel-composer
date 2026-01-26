@@ -130,6 +130,35 @@ def _run_async(coro):
     else:
         loop.create_task(coro)
 
+def _strip_noexport_sections(text: str) -> str:
+    """
+    Removes sections whose heading ends with '{.noexport}'.
+    The section includes the heading itself and all content
+    until a heading of the same or higher level appears.
+    """
+    output = []
+    skip_level = None
+
+    for line in text.splitlines():
+        m = re.match(r"^(\s*)(#+)\s+(.*)", line)
+
+        if m:
+            level = len(m.group(2))
+            title = m.group(3).rstrip()
+
+            # End skipping if we reached same or higher level
+            if skip_level is not None and level <= skip_level:
+                skip_level = None
+
+            # Start skipping if this heading has {.noexport}
+            if title.endswith("{.noexport}"):
+                skip_level = level
+                continue
+
+        if skip_level is None:
+            output.append(line)
+
+    return "\n".join(output)
 
 # ============================================================
 # PUBLIC API
@@ -154,6 +183,7 @@ def wg_send_markdown_buffer(buffer: str) -> bool:
         else:
             target_words = int(metadata["target_words"])
 
+        body = _strip_noexport_sections(body)
         body = _strip_markdown_headings(body)
 
         word_count = _word_count(body)
