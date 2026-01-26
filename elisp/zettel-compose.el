@@ -23,6 +23,9 @@
     ;; -M, --stream-to-marked
     (when (plist-get options :stream-to-marked)
       (push "--stream-to-marked" args))
+    ;; --writers-gadget
+    (when (plist-get options :writers-gadget)
+      (push "--writers-gadget" args))
     ;; -H, --heading-identifier=
     (when (plist-get options :heading-identifier)
       (push (concat "--heading-identifier=" (plist-get options :heading-identifier)) args))
