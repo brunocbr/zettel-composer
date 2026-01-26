@@ -44,7 +44,8 @@ options = {
 	'no-title': False,
 	'insert-bib-ref': False,
 	'no-front-matter': False,
-    'extract-mode': False
+    'extract-mode': False,
+    'writers-gadget': False
 }
 
 rx_dict = OrderedDict([
@@ -369,7 +370,8 @@ def parse_zettel(z_item, zettel_id):
 			fn_id = match.group('fn_id')
 			left_chunk = rx_dict['footnote'].sub("[^fn-" + zettel_id + "-" + fn_id + "]", left_chunk)
 
-
+		elif key == 'yaml_div':
+			return '---'
 
 		return left_chunk + parse_chunk(chunk[end:])
 
@@ -377,10 +379,13 @@ def parse_zettel(z_item, zettel_id):
 		lines = file_object.read().splitlines()
 
 	zettel_title = 'Untitled'
+	got_frontmatter = False
+    
 	for line in lines:
 		insert_quotes = []
 		insert_parallel_texts = []
 		insert_sequence = []
+		
 		# at each line check for a match with a regex
 		key, match, end = _parse_line(line, rx_dict)
 
@@ -390,9 +395,10 @@ def parse_zettel(z_item, zettel_id):
 				zettel_title = match.group('id')
 				z_item['title'] = zettel_title
 			frontmatter.append(line)
+			got_frontmatter = not yaml_divert
 			continue
 
-		if key == "yaml_div":
+		if (key == "yaml_div") and not got_frontmatter:
 			yaml_divert = True
 			frontmatter.append(line)
 			continue
@@ -518,6 +524,12 @@ def stream_to_marked(data):
 		data = data.decode('utf8')
 	pb.setString_forType_(data, 'public.utf8-plain-text')
 
+def send_to_writers_gadget(data):
+    from writers_gadget_ble import wg_send_markdown_buffer
+
+    return wg_send_markdown_buffer(data)
+    
+
 def get_first_modified():
 	global z_stack
 	global z_map
@@ -551,7 +563,7 @@ def parse_index(pathname):
 			else:
 				for l in contents:
 					parse_index.f_out.write("%s\n" % l)	
-		if options["stream-to-marked"]:
+		if options["stream-to-marked"] or options["writers-gadget"]:
 			parse_index.output = parse_index.output + contents
 
 	_z_set_index(pathname)
@@ -580,6 +592,9 @@ def parse_index(pathname):
 	if options["stream-to-marked"]:
 		stream_to_marked("\n".join(parse_index.output))
 
+	if options['writers-gadget']:
+		send_to_writers_gadget("\n".join(parse_index.output))
+
 def watch_folder():
 	global z_stack, options
 
@@ -595,8 +610,7 @@ def watch_folder():
 
 useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:PLX', [ 'no-commented-references', 
 	'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 
-	'suppress-index', 'no-separator', 'link-all', 'custom-url=', 'section-symbol=', 'no-title', 'insert-bib-ref',
-	'no-front-matter'])
+	'suppress-index', 'no-separator', 'link-all', 'custom-url=', 'section-symbol=', 'no-title', 'insert-bib-ref','no-front-matter', 'writers-gadget'])
 
 if infile == [ ]:
 	raise ValueError("Argument is missing: you must provide a file name for the index note.")
@@ -655,6 +669,8 @@ for opt, arg in useroptions:
 		options['no-front-matter'] = True
 	elif opt in ('-X'):
 		options['extract-mode'] = True
+	elif opt == '--writers-gadget':
+		options['writers-gadget'] = True
 
 index_filename = infile[0]
 if options["verbose"]:
