@@ -4,7 +4,7 @@ import yaml
 import asyncio
 import logging
 from typing import Optional, Tuple
-from time import sleep
+from time import time, sleep
 
 from bleak import BleakScanner, BleakClient
 
@@ -16,7 +16,10 @@ from bleak import BleakScanner, BleakClient
 # DEVICE_NAME = "Writers' Gadget"
 SERVICE_UUID = "0000fff0-0000-1000-8000-00805f9b34fb"
 CHAR_TARGET_UUID = "0000fff2-0000-1000-8000-00805f9b34fb"
-CHAR_COUNT_UUID  = "0000fff1-0000-1000-8000-00805f9b34fb"
+CHAR_COUNT_UUID = "0000fff1-0000-1000-8000-00805f9b34fb"
+CHAR_DATETIME_UUID = "0000fff3-0000-1000-8000-00805f9b34fb"
+
+
 
 YAML_START = "---"
 YAML_END = ("---", "...")
@@ -111,6 +114,13 @@ async def _send_ble(word_count: int, target_words: int):
         await client.write_gatt_char(
             CHAR_COUNT_UUID,
             struct.pack("<I", word_count),
+            response=False
+        )
+
+        epoch = int(time())
+        await client.write_gatt_char(
+            CHAR_DATETIME_UUID,
+            struct.pack("<I", epoch),
             response=False
         )
 
