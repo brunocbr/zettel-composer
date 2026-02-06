@@ -45,7 +45,8 @@ options = {
 	'insert-bib-ref': False,
 	'no-front-matter': False,
     'extract-mode': False,
-    'writers-gadget': False
+    'writers-gadget': False,
+    'gadget-mac': None
 }
 
 rx_dict = OrderedDict([
@@ -527,8 +528,8 @@ def stream_to_marked(data):
 def send_to_writers_gadget(data):
     from writers_gadget_ble import wg_send_markdown_buffer
 
-    return wg_send_markdown_buffer(data)
-    
+    return wg_send_markdown_buffer(data, options['gadget-mac'])
+
 
 def get_first_modified():
 	global z_stack
@@ -610,7 +611,7 @@ def watch_folder():
 
 useroptions, infile = getopt.getopt(sys.argv[1:], 'CO:MH:s:WnSIt:G:vh:PLX', [ 'no-commented-references', 
 	'no-paragraph-headings', 'heading-identifier=', 'watch', 'sleep-time=', 'output=', 'stream-to-marked', 
-	'suppress-index', 'no-separator', 'link-all', 'custom-url=', 'section-symbol=', 'no-title', 'insert-bib-ref','no-front-matter', 'writers-gadget'])
+	'suppress-index', 'no-separator', 'link-all', 'custom-url=', 'section-symbol=', 'no-title', 'insert-bib-ref','no-front-matter', 'writers-gadget', 'gadget-mac='])
 
 if infile == [ ]:
 	raise ValueError("Argument is missing: you must provide a file name for the index note.")
@@ -671,6 +672,8 @@ for opt, arg in useroptions:
 		options['extract-mode'] = True
 	elif opt == '--writers-gadget':
 		options['writers-gadget'] = True
+	elif opt == '--gadget-mac':
+		options['gadget-mac'] = arg
 
 index_filename = infile[0]
 if options["verbose"]:
