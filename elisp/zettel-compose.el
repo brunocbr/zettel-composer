@@ -26,6 +26,9 @@
     ;; --writers-gadget
     (when (plist-get options :writers-gadget)
       (push "--writers-gadget" args))
+    ;; --gadget-mac
+    (when (plist-get options :gadget-mac)
+      (push "--gadget-mac" args))
     ;; -H, --heading-identifier=
     (when (plist-get options :heading-identifier)
       (push (concat "--heading-identifier=" (plist-get options :heading-identifier)) args))
