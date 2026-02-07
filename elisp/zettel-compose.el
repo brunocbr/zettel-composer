@@ -94,22 +94,6 @@ You need to use the MacOS app for BLE support."
     ;; Return the arguments
     args))
 
-;; (defun zettel-compose-run (options)
-;;   "Run the zettel-compose.py script with OPTIONS."
-;;   (interactive
-;;    (let ((output (read-string "Output file: " nil nil))
-;;          (stream-to-marked (yes-or-no-p "Stream to marked? "))
-;;          (watch (yes-or-no-p "Watch the input file? ")))
-;;      (list (list :output output
-;;                  :stream-to-marked stream-to-marked
-;;                  :watch watch
-;;                  :index-file (buffer-file-name (current-buffer))))))
-;;   (let* ((args (zettel-compose--build-args options))
-;;          (command (mapconcat 'identity (cons zettel-compose-script-path args) " "))
-;;          (output-buffer-name (generate-new-buffer-name "*zettel-compose-output*")))
-;;     (message "Running command: %s" command)
-;;     (start-process-shell-command "*zettel-compose*" output-buffer-name command)))
-
 ;;;###autoload
 (defun zettel-compose-run (options)
   "Run the zettel-compose script.
@@ -129,7 +113,7 @@ If zettel-compose-script-path is a .app, use 'open -a'. Otherwise, run directly.
                       (format "open %s --args %s"
                               (shell-quote-argument zettel-compose-script-path)
                               (mapconcat 'identity args " "))
-                    (mapconcat 'shell-quote-argument
+                    (mapconcat 'identity
                                (cons zettel-compose-script-path args) " ")))
          (output-buffer-name (generate-new-buffer-name "*zettel-compose-output*")))
 
