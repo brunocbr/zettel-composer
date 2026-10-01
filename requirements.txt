@@ -1,2 +1,9 @@
-bleak>=0.21.1
-pyyaml>=6.0.1
+AppKit>=0.2.8
+bleak>=3.0.2
+pyobjc_framework_cocoa>=12.1
+pyobjc_framework_cocoa>=12.2.2
+PyYAML>=6.0.3
+setuptools>=84.0.0
+setuptools>=65.5.0
+PyInstaller>=6.22.0
+
