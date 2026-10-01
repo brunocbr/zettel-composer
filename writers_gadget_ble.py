@@ -124,6 +124,8 @@ def wg_send_markdown_buffer(buffer: str, destination: Optional[str] = None) -> b
         # 12-byte payload: Goal (I), Count (I), Epoch (I)
         payload = struct.pack("<III", target_words, word_count, int(time()))
 
+        log.info(f"Word count: {word_count} / target words: {target_words}.")
+
         # Decidir estratégia
         is_ip = destination and re.match(r"^\d{1,3}(\.\d{1,3}){3}$", destination)
 
